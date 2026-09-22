@@ -22,11 +22,18 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Inscription et création de profil ; confirmation d'e-mail requise.
 - Connexion de deux comptes de test ; sessions conservées après actualisation
   et réouverture du navigateur ; pseudo du joueur A conservé.
-- Lecture du profil, solde initial et statistiques.
+- Lecture du profil, solde et statistiques ; solde A de 250 pièces confirmé en SQL.
 - Liars Bar normal : création d'un salon, jointure du second compte,
   affichage des deux joueurs sans actualisation, lancement sur les deux clients,
   carte jouée et passage de tour synchronisé, accusation soumise.
 - Pas de partie complète ni de récompense de fin de partie validée à ce stade.
+- Who is Who : salon à deux, lancement, votes des deux joueurs et révélation
+  synchronisée ; départ B reflété chez A par la fin de partie.
+  Une alerte `not_room_host` est apparue au lancement malgré le démarrage réussi :
+  anomalie à reproduire et diagnostiquer avant validation complète.
+- Blackjack : création et lancement solo, table affichée. Compte B sans pièces
+  (0 confirmé en SQL) ; aucune manche complète validée.
+- Publication Realtime vérifiée en SQL : `public.rooms` et `public.room_players`.
 
 ## Vérifications encore nécessaires
 
@@ -60,5 +67,7 @@ Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
 La connexion Git Vercel doit être vérifiée : l'ancien déploiement référence encore
 `Sancacaprout/Latableronde`. Une publication GitHub seule ne prouve pas un déploiement.
+Le code du site a été envoyé sur `main` (commit de restauration `153ed26`).
+La connexion du compte propriétaire Vercel est encore demandée dans le navigateur.
 
 Ce document est un état intermédiaire, pas une validation complète de production.
