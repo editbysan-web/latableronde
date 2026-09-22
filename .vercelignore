@@ -1,0 +1,9 @@
+.restoration/
+.git/
+.env
+.env.*
+node_modules/
+scripts/
+*.sql
+*.md
+*.log

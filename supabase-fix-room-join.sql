@@ -1,0 +1,2 @@
+-- Compatibility wrapper: use supabase-multiplayer-setup.sql as the source of truth.
+-- Copy/paste the full content of supabase-multiplayer-setup.sql into Supabase SQL Editor and run it once.

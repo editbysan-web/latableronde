@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: blob: https://yhdafozbxydqemphdqvb.supabase.co; media-src 'self' blob: https://yhdafozbxydqemphdqvb.supabase.co; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://yhdafozbxydqemphdqvb.supabase.co wss://yhdafozbxydqemphdqvb.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+    />
+    <meta name="theme-color" content="#101114" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>LaTableRonde</title>
+    <link rel="stylesheet" href="./styles.css?v=2026-06-05-blackjack-bet-input-v36" />
+  </head>
+  <body>
+    <div class="phone-shell">
+      <aside class="rotate-lock" aria-live="polite">
+        <strong>Tourne ton telephone</strong>
+        <span>LaTableRonde est pense uniquement en mode portrait.</span>
+      </aside>
+
+      <main class="app" id="app">
+        <section class="screen active" data-screen="auth" aria-labelledby="auth-title">
+          <div class="brand-block">
+            <img class="brand-mark" src="./Image%20site/logo.png" alt="" />
+            <p class="eyebrow">Jeux entre amis</p>
+            <h1 id="auth-title">LaTableRonde</h1>
+            <p class="lead">Connecte-toi pour rejoindre une partie. Aucun acces invite.</p>
+          </div>
+
+          <form class="auth-panel" id="auth-form" autocomplete="on">
+            <div class="auth-tabs" role="tablist" aria-label="Mode de connexion">
+              <button class="auth-tab active" type="button" data-auth-mode="login">Connexion</button>
+              <button class="auth-tab" type="button" data-auth-mode="signup">Creer un compte</button>
+            </div>
+            <label id="pseudo-field">
+              Pseudo
+              <input id="pseudo" name="pseudo" maxlength="18" placeholder="Ex: Arthur" autocomplete="nickname" />
+            </label>
+            <label>
+              Email
+              <input id="email" name="email" required type="email" placeholder="toi@email.com" autocomplete="email" />
+            </label>
+            <label>
+              Mot de passe
+              <span class="password-row">
+                <input id="password" name="password" required minlength="8" type="password" autocomplete="current-password" />
+                <button class="password-toggle" type="button" id="toggle-password" aria-label="Afficher le mot de passe">Voir</button>
+              </span>
+            </label>
+            <button class="primary" type="submit" id="auth-submit">Connexion</button>
+            <p class="notice" id="auth-notice"></p>
+          </form>
+        </section>
+
+        <section class="screen" data-screen="home" aria-labelledby="home-title">
+          <header class="topbar">
+            <div class="home-brand">
+              <img class="home-logo" src="./Image%20site/logo.png" alt="" />
+              <div>
+                <span class="small-label" id="account-label">Connecte en tant que</span>
+                <h2 id="home-title">LaTableRonde</h2>
+              </div>
+            </div>
+            <button class="icon-btn" type="button" id="logout" aria-label="Deconnexion">x</button>
+          </header>
+
+          <div class="hero">
+            <h1>Joue autour de la table, meme a distance.</h1>
+          </div>
+
+          <div class="home-actions">
+            <button class="primary big" type="button" id="play-join">Rejoindre avec un code</button>
+            <button class="secondary big" type="button" id="create-room">Creer une partie</button>
+            <button class="june-gift-button hidden" type="button" id="claim-june-gift">
+              <span>Réclamer 1000 pièces</span>
+              <small>Cadeau disponible aujourd’hui seulement</small>
+            </button>
+            <button class="secondary big profile-open" type="button" id="open-profile" data-open-profile>Mon profil</button>
+            <form class="join-row" id="pseudo-form">
+              <input id="home-pseudo" maxlength="18" placeholder="Ton pseudo" aria-label="Changer de pseudo" autocomplete="nickname" />
+              <button class="ghost" type="submit">Valider</button>
+            </form>
+            <button class="shop-open" type="button" id="open-shop">Boutique</button>
+            <button class="lucky-wheel-open" type="button" id="open-lucky-wheel">Roue de la chance</button>
+            <button class="dark-market-open closed" type="button" id="open-dark-market" data-open-dark-market>
+              <span>◆ Dark Market</span>
+              <small>Ouvert de 22h à 05h</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="games" aria-labelledby="games-title">
+          <header class="topbar">
+            <button class="icon-btn" type="button" data-go="home" aria-label="Retour">‹</button>
+            <h2 id="games-title">Choisir un jeu</h2>
+            <span></span>
+          </header>
+
+          <div class="game-picker">
+            <button class="game-tile who" type="button" data-pick-game="who">
+              <img src="./Image%20site/whoiswho.png" alt="" />
+              <span>Who is Who</span>
+            </button>
+            <button class="game-tile liar" type="button" data-pick-game="liars">
+              <img src="./Image%20site/liarsbar.png" alt="" />
+              <span>Liars Bar</span>
+            </button>
+            <button class="game-tile trueonly" type="button" data-pick-game="true">
+              <img src="./Image%20site/TrueOnly.png" alt="" />
+              <span>True Only</span>
+            </button>
+            <button class="game-tile blackjack" type="button" data-pick-game="blackjack">
+              <img src="./Image%20site/imagedead21.png" alt="" />
+              <span>Blackjack</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="lobby" aria-labelledby="lobby-title">
+          <header class="topbar">
+            <button class="icon-btn" type="button" id="leave-room-top" aria-label="Quitter le salon">‹</button>
+            <div>
+              <span class="small-label">Code de la partie</span>
+              <h2 id="lobby-title">Lobby</h2>
+            </div>
+            <button class="icon-btn" type="button" id="share-room" aria-label="Copier le code">⧉</button>
+          </header>
+
+          <div class="lobby-afk-setting hidden" id="lobby-afk-setting"></div>
+          <div class="room-code-card" id="room-label">TABLE1</div>
+
+          <section class="players" id="players"></section>
+
+          <section class="settings">
+            <h3>Modes</h3>
+            <div id="settings-content"></div>
+          </section>
+
+          <button class="shop-open lobby-shop-open hidden" type="button" data-open-shop>Boutique</button>
+
+          <div class="bottom-actions">
+            <button class="secondary" type="button" id="leave-room">Quitter</button>
+            <button class="primary" type="button" id="start-game">Lancer</button>
+          </div>
+        </section>
+
+        <section class="screen game-screen who-screen" data-screen="who-game" aria-labelledby="who-title">
+          <header class="game-header who-header">
+            <button class="icon-btn who-exit" type="button" id="leave-who-game" aria-label="Quitter la partie">‹</button>
+            <div>
+              <span class="small-label" id="who-round">Question 1/12</span>
+              <h2 id="who-title">Who is Who</h2>
+            </div>
+            <div class="timer who-timer" id="who-timer">15s</div>
+          </header>
+
+          <div class="who-stage" id="who-stage">
+              <span>📸</span>
+          </div>
+
+          <div class="who-vote-grid" id="who-vote-grid"></div>
+
+          <div class="bottom-actions">
+            <button class="secondary" type="button" id="who-skip">Attendre</button>
+            <button class="primary" type="button" id="who-next">Suite</button>
+          </div>
+        </section>
+
+        <section class="screen game-screen true-screen" data-screen="true-game" aria-labelledby="true-title">
+          <header class="game-header true-header">
+            <button class="icon-btn true-exit" type="button" id="leave-true-game" aria-label="Quitter la partie">‹</button>
+            <div>
+              <span class="small-label" id="true-round">Ecriture</span>
+              <h2 id="true-title">True Only</h2>
+            </div>
+            <div class="timer true-timer" id="true-timer">10s</div>
+          </header>
+
+          <div class="true-stage" id="true-stage"></div>
+          <div class="true-actions" id="true-actions"></div>
+        </section>
+
+        <section class="screen game-screen blackjack-screen" data-screen="blackjack-game" aria-labelledby="blackjack-title">
+          <header class="game-header blackjack-header">
+            <button class="icon-btn blackjack-exit" type="button" id="leave-blackjack-game" aria-label="Quitter la partie">‹</button>
+            <div>
+              <span class="small-label" id="blackjack-phase">Blackjack</span>
+              <h2 id="blackjack-title">Table Blackjack</h2>
+            </div>
+            <div class="blackjack-bank" id="blackjack-bank"></div>
+          </header>
+
+          <div class="blackjack-table" id="blackjack-table"></div>
+
+          <div class="blackjack-actions" id="blackjack-actions"></div>
+        </section>
+
+        <section class="screen game-screen" data-screen="liars-game" aria-labelledby="liars-title">
+          <header class="game-header liars-header">
+            <button class="icon-btn liars-exit" type="button" id="leave-liars-game" aria-label="Quitter la partie">‹</button>
+            <div>
+              <span class="small-label">Valeur du tour</span>
+              <h2 id="liars-title">Roi</h2>
+            </div>
+            <div class="liars-log" id="liars-log"></div>
+          </header>
+
+          <div class="liars-table">
+            <div class="seat top" id="seat-1"></div>
+            <div class="seat left" id="seat-2"></div>
+            <div class="seat right" id="seat-3"></div>
+            <div class="seat left left-two" id="seat-4"></div>
+            <div class="seat right right-two" id="seat-5"></div>
+            <div class="edge-hand top-hand" id="edge-hand-1"></div>
+            <div class="edge-hand left-hand" id="edge-hand-2"></div>
+            <div class="edge-hand right-hand" id="edge-hand-3"></div>
+            <div class="edge-hand left-hand left-hand-two" id="edge-hand-4"></div>
+            <div class="edge-hand right-hand right-hand-two" id="edge-hand-5"></div>
+            <div class="played-pile" id="played-pile">0</div>
+            <div class="seat bottom" id="seat-0"></div>
+            <div class="edge-hand bottom-hand" id="edge-hand-0"></div>
+            <button class="hand-privacy-toggle" type="button" id="hand-privacy-toggle" aria-label="Cacher la main">
+              <img src="./Image%20liarsbar/oeil.jpg" alt="" />
+            </button>
+          </div>
+
+          <div class="bottom-actions">
+            <button class="danger" type="button" id="accuse">Accuser</button>
+            <button class="secondary" type="button" id="play-cards">Jouer</button>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="end" aria-labelledby="end-title">
+          <header class="topbar">
+            <h2 id="end-title">Fin de partie</h2>
+          </header>
+          <ol class="ranking" id="ranking"></ol>
+          <div class="bottom-actions">
+            <button class="secondary" type="button" id="end-quit">Quitter</button>
+            <button class="primary" type="button" id="replay">Rejouer</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="modal hidden" id="join-modal" aria-hidden="true">
+      <form class="modal-panel" id="join-form">
+        <button class="icon-btn modal-close" type="button" id="close-join-modal" aria-label="Fermer">x</button>
+        <span class="small-label">Rejoindre une partie</span>
+        <h2>Code du salon</h2>
+        <input id="room-code" maxlength="4" placeholder="CODE" aria-label="Code de partie" autocapitalize="characters" />
+        <button class="primary" type="submit">Rejoindre</button>
+      </form>
+    </div>
+    <div class="modal hidden" id="liars-mode-modal" aria-hidden="true">
+      <form class="modal-panel" id="liars-mode-form">
+        <button class="icon-btn modal-close" type="button" id="close-liars-mode-modal" aria-label="Fermer">x</button>
+        <span class="small-label">Liars Bar</span>
+        <h2>Choisir le mode</h2>
+        <div class="liars-mode-options">
+          <button class="mode-card" type="button" data-create-liars-mode="normal">
+            <strong>Mode normal</strong>
+            <small>Vies classiques, accusations rapides.</small>
+          </button>
+          <button class="mode-card danger-mode" type="button" data-create-liars-mode="roulette">
+            <strong>Roulette Russe</strong>
+            <small>Un tir apres chaque erreur. Dernier vivant gagne.</small>
+          </button>
+          <button class="mode-card chaos-mode" type="button" data-create-liars-mode="chaos">
+            <strong>Chaos</strong>
+            <small>Demon, Chasseur, tirs en chaine.</small>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="liars-overlay" id="liars-overlay" aria-hidden="true"></div>
+    <div class="modal hidden" id="shop-modal" aria-hidden="true">
+      <section class="shop-panel" role="dialog" aria-modal="true" aria-labelledby="shop-title">
+        <header class="shop-header">
+          <h2 id="shop-title">Boutique</h2>
+          <div class="shop-balance">
+            <span id="shop-coins">0</span>
+            <img src="./Boutique/piece.png" alt="" />
+          </div>
+          <button class="icon-btn modal-close" type="button" id="close-shop" aria-label="Fermer">x</button>
+        </header>
+        <div class="shop-content" id="shop-content"></div>
+      </section>
+    </div>
+    <div class="modal hidden" id="lucky-wheel-modal" aria-hidden="true">
+      <section class="lucky-wheel-panel" role="dialog" aria-modal="true" aria-labelledby="lucky-wheel-title">
+        <header class="lucky-wheel-header">
+          <div>
+            <span class="small-label">Compte joueur</span>
+            <h2 id="lucky-wheel-title">Roue de la chance</h2>
+          </div>
+          <button class="icon-btn modal-close" type="button" id="close-lucky-wheel" aria-label="Fermer">x</button>
+        </header>
+        <div class="lucky-wheel-stage" id="lucky-wheel-stage"></div>
+      </section>
+    </div>
+    <div class="modal hidden" id="profile-modal" aria-hidden="true">
+      <section class="profile-panel" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+        <header class="profile-header">
+          <h2 id="profile-title">Profil</h2>
+          <button class="icon-btn modal-close" type="button" id="close-profile" aria-label="Fermer">x</button>
+        </header>
+        <div class="profile-content" id="profile-content"></div>
+      </section>
+    </div>
+    <div class="modal hidden" id="afk-host-modal" aria-hidden="true">
+      <section class="presence-panel" role="dialog" aria-modal="true" aria-labelledby="afk-host-title">
+        <span class="small-label">Anti-AFK</span>
+        <h2 id="afk-host-title">Joueur inactif</h2>
+        <p id="afk-host-text">Un joueur est inactif.</p>
+        <div class="presence-actions">
+          <button class="secondary" type="button" id="afk-wait">Attendre</button>
+          <button class="secondary" type="button" id="afk-extend">Donner plus de temps</button>
+          <button class="danger" type="button" id="afk-kick">Exclure</button>
+        </div>
+      </section>
+    </div>
+    <div class="modal hidden" id="presence-modal" aria-hidden="true">
+      <section class="presence-panel" role="dialog" aria-modal="true" aria-labelledby="presence-title">
+        <span class="small-label">Connexion</span>
+        <h2 id="presence-title">Êtes-vous toujours là ?</h2>
+        <p>La partie a été mise en pause sur cet appareil. Vous avez <strong id="presence-countdown">20</strong>s pour vous resynchroniser.</p>
+        <div class="presence-actions">
+          <button class="secondary" type="button" id="presence-no">Non</button>
+          <button class="primary" type="button" id="presence-yes">Oui</button>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
+    <script src="./supabase-config.js?v=2026-09-21-restore"></script>
+    <script src="./app.js?v=2026-09-21-restore"></script>
+  </body>
+</html>
