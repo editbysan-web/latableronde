@@ -26,7 +26,16 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Liars Bar normal : création d'un salon, jointure du second compte,
   affichage des deux joueurs sans actualisation, lancement sur les deux clients,
   carte jouée et passage de tour synchronisé, accusation soumise.
-- Pas de partie complète ni de récompense de fin de partie validée à ce stade.
+- Roulette russe Liars Bar : deux joueurs synchronisés, carte bluffée,
+  accusation, tir à blanc et compteur de tir synchronisé. Après abandon de B,
+  A a reçu 150 pièces, persistées après retour au profil. Le SQL exclut
+  volontairement les parties avec forfait des statistiques et de l'XP :
+  ce résultat de forfait n'a donc pas compté comme partie jouée.
+- Deux parties Roulette russe terminées naturellement après un tir fatal :
+  victoire, 150 pièces, statistiques et XP persistés. Une double comptabilisation
+  des accusations a été corrigée dans le client puis vérifiée sur la seconde
+  partie : une accusation de plus à l'écran correspond à une unité de plus
+  au profil. La sortie du résultat côté B ne déclenche plus d'alerte AFK indue.
 - Who is Who : salon à deux, lancement, votes des deux joueurs et révélation
   synchronisée ; départ B reflété chez A par la fin de partie.
   Une alerte `not_room_host` est apparue au lancement malgré le démarrage réussi :
@@ -34,19 +43,25 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - True Only : salon à deux, lancement, anecdotes des deux joueurs, votes,
   révélations et classement final synchronisés. Les libellés accentués ont été
   corrigés sans modifier les règles ; vérification de l'affichage local.
-- Blackjack : création et lancement solo, table affichée. Compte B sans pièces
-  (0 confirmé en SQL) ; aucune manche complète validée.
+- Blackjack : manche solo complète, mise de 50, score joueur 20 contre 17,
+  victoire et gain de 50. Solde passé de 250 à 300, résultat et statistiques
+  conservés après actualisation et retour au profil.
+- Roue : gain de 300 pièces, délai de trois heures et blocage d'un second
+  tour conservés après actualisation.
+- Boutique : skin de revolver « Bois » acheté pour 500 pièces puis équipé ;
+  solde et équipement conservés après actualisation. Le compte B affichait
+  toujours zéro pièce et aucun achat.
 - Publication Realtime vérifiée en SQL : `public.rooms` et `public.room_players`.
 
 ## Vérifications encore nécessaires
 
-- Fin de partie Liars Bar et persistance des récompenses, XP, badges.
-- Roulette russe, Chaos, Blackjack et Who is Who de bout en bout.
+- Badges Liars Bar et comportement des récompenses en cas de forfait.
+- Mode normal Liars Bar, Chaos et Who is Who de bout en bout.
 - Dead 21 et Photo Roulette : code backend/frontend présent mais aucun accès
   dans le sélecteur de jeux de la version fournie ; ne pas les annoncer jouables.
 - Upload, lecture et suppression Storage, refus d'accès entre utilisateurs.
-- Achats et équipement boutique, roue, déconnexion/reconnexion explicite.
-- Liaison Git automatique Vercel et essais de jeu complets sur le domaine public.
+- Déconnexion/reconnexion explicite et essais de jeu complets sur le domaine
+  public. La liaison Git automatique est écartée par choix de l'utilisateur.
 
 ## Limites de sécurité à traiter
 
@@ -54,6 +69,8 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   peut permettre de lire une photo. Les règles d'écriture ne rendent pas la lecture privée.
 - Plusieurs états et récompenses Liars Bar restent contrôlés par le client.
   La restauration des permissions ne constitue pas une protection anti-triche complète.
+- Une victoire par forfait donne 150 pièces mais n'incrémente ni partie jouée
+  ni XP ; vérifier si cette asymétrie est voulue avant de modifier la règle.
 - Les politiques de lecture des salons sont larges pour les comptes authentifiés.
 
 ## Exploitation locale
@@ -73,8 +90,9 @@ Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiem
 le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
 reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
-`localhost:4173`. Le dépôt `main` contient le correctif de True Only
-(`64b3dc0`). Les fichiers privés `.env.local`, SQL et ce rapport renvoient 404
+`localhost:4173`. Le dépôt `main` contient les corrections de True Only,
+du profil Roulette russe et de la sortie de salon. Les fichiers privés
+`.env.local`, SQL et ce rapport renvoient 404
 sur le domaine public.
 
 La connexion Git automatique Vercel n'est pas active : le compte GitHub lié à

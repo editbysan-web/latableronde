@@ -2577,21 +2577,24 @@ async function addCurrentPlayerToRoom(roomId) {
 
 async function loadRoomPlayers() {
   if (!state.currentRoomId) return;
+  const roomId = state.currentRoomId;
   let { data, error } = await db
     .from("room_players")
     .select("user_id,pseudo,score,ready,weapon_skin,name_skin,death_skin")
-    .eq("room_id", state.currentRoomId)
+    .eq("room_id", roomId)
     .order("joined_at", { ascending: true });
 
   if (error && (String(error.message || "").includes("joined_at") || String(error.message || "").includes("weapon_skin") || String(error.message || "").includes("name_skin") || String(error.message || "").includes("death_skin") || String(error.message || "").includes("coins"))) {
     const fallback = await db
       .from("room_players")
       .select("user_id,pseudo,score,ready")
-      .eq("room_id", state.currentRoomId)
+      .eq("room_id", roomId)
       .order("pseudo", { ascending: true });
     data = fallback.data;
     error = fallback.error;
   }
+
+  if (state.currentRoomId !== roomId || state.leavingRoom) return;
 
   if (error) {
     showMessage("Impossible de charger les joueurs de la partie: " + (error.message || "erreur inconnue"));
@@ -2611,7 +2614,7 @@ async function loadRoomPlayers() {
 
   if (state.players.length) {
     let coinsRows = [];
-    const coinsResult = await db.rpc("get_room_player_coins_rpc", { p_room_id: state.currentRoomId });
+    const coinsResult = await db.rpc("get_room_player_coins_rpc", { p_room_id: roomId });
     if (!coinsResult.error) {
       coinsRows = coinsResult.data || [];
     } else if (!isMissingRpc(coinsResult.error)) {
@@ -2624,6 +2627,7 @@ async function loadRoomPlayers() {
         .in("id", state.players.map((player) => player.id));
       coinsRows = profiles || [];
     }
+    if (state.currentRoomId !== roomId || state.leavingRoom) return;
     const coinsById = Object.fromEntries((coinsRows || []).map((profile) => [profile.id || profile.user_id, Number(profile.coins || 0)]));
     state.players = state.players.map((player) => ({
       ...player,
@@ -2631,6 +2635,7 @@ async function loadRoomPlayers() {
     }));
   }
 
+  if (state.currentRoomId !== roomId || state.leavingRoom) return;
   if (!state.players.some((player) => player.id === state.user.id)) {
     clearLocalRoomSession();
     if (!state.leavingRoom) showMessage("Tu as ete deconnecte de la partie pour inactivite.");
@@ -2680,13 +2685,14 @@ function subscribeToRoomPlayers() {
 
 async function loadCurrentRoom() {
   if (!state.currentRoomId) return;
+  const roomId = state.currentRoomId;
   const { data, error } = await db
     .from("rooms")
     .select("id,code,game,host_id,status,settings")
-    .eq("id", state.currentRoomId)
+    .eq("id", roomId)
     .maybeSingle();
 
-  if (error || !data) return;
+  if (error || !data || state.currentRoomId !== roomId || state.leavingRoom) return;
   applyRoomState(data);
 }
 
@@ -2888,20 +2894,21 @@ function liarsEndDelay(gameState) {
 
 function subscribeToRoomState() {
   if (!db || !state.currentRoomId) return;
+  const roomId = state.currentRoomId;
   if (state.roomStateChannel) db.removeChannel(state.roomStateChannel);
   state.roomStateLive = false;
   state.roomStateChannel = db
-    .channel(`rooms:${state.currentRoomId}`)
+    .channel(`rooms:${roomId}`)
     .on(
       "postgres_changes",
-      { event: "*", schema: "public", table: "rooms", filter: `id=eq.${state.currentRoomId}` },
+      { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomId}` },
       (payload) => {
-        if (payload.new) applyRoomState(payload.new);
+        if (payload.new && state.currentRoomId === roomId && !state.leavingRoom) applyRoomState(payload.new);
       },
     )
     .subscribe((status) => {
       state.roomStateLive = status === "SUBSCRIBED";
-      if (status === "SUBSCRIBED") loadCurrentRoom();
+      if (status === "SUBSCRIBED" && state.currentRoomId === roomId && !state.leavingRoom) loadCurrentRoom();
     });
 }
 
@@ -7762,13 +7769,11 @@ async function accuse() {
   setLiarsBadgeFlag(gameState, accusedId, "accusedThisGame", true);
   if (lied) {
     stats[state.user.id].accuseOk += 1;
-    addLiarsProfileStat(gameState, state.user.id, "accuseOk", 1);
     addLiarsProfileStat(gameState, accusedId, "bluffsFailed", 1);
     addLiarsBadgeStat(gameState, state.user.id, "accuseStreak", 1);
     setLiarsBadgeStatMax(gameState, state.user.id, "maxAccuseStreak", Number(gameState.badgeStats?.[state.user.id]?.accuseStreak || 0));
   } else {
     stats[state.user.id].accuseWrong += 1;
-    addLiarsProfileStat(gameState, state.user.id, "accuseWrong", 1);
     addLiarsProfileStat(gameState, accusedId, "bluffsSuccessful", 1);
     gameState.badgeStats ||= {};
     gameState.badgeStats[state.user.id] ||= {};
