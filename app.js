@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-09-23-restore-v3";
+const APP_BUILD_VERSION = "2026-09-23-restore-v5";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
