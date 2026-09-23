@@ -5202,12 +5202,12 @@ function cardImage(card) {
     Demon: "./Image%20liarsbar/demon.png",
     Chasseur: "./Image%20liarsbar/chasseur.png",
     FarWest: "./Image%20liarsbar/farwest.png",
-    Joker: "./joker.png?v=3",
+    Joker: "./Image%20liarsbar/joker.png",
     Back: "./Image%20liarsbar/doscartes.png",
     Accuse: "./Image%20liarsbar/accuser.png",
-    Life: "./vie.png?v=1",
+    Life: "./Image%20liarsbar/vie.png",
     Roulette: "./Image%20liarsbar/roulette.png",
-    Mort: "./mort.png?v=1",
+    Mort: "./Image%20liarsbar/mort.png",
   };
   return paths[card] || "";
 }

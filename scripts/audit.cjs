@@ -18,7 +18,7 @@ for (const name of from) if (!tables.has(name)) errors.push('Missing table: ' + 
 const references = new Set();
 for (const name of ['index.html', 'styles.css', 'app.js']) {
   const text = read(name);
-  for (const m of text.matchAll(/(?:["'`(])((?:\.\/)?(?:Badge|Boutique|Image(?:%20| )(?:site|dead|liarsbar))\/[^"'`<>\r\n]*?\.(?:png|jpg|jpeg|webp))/gi)) {
+  for (const m of text.matchAll(/(?:["'`(])(\.\/[^"'`<>\r\n]*?\.(?:png|jpg|jpeg|webp))/gi)) {
     if (!m[1].includes('${')) references.add(decodeURIComponent(m[1]));
   }
 }
