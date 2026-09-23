@@ -35,7 +35,9 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   victoire, 150 pièces, statistiques et XP persistés. Une double comptabilisation
   des accusations a été corrigée dans le client puis vérifiée sur la seconde
   partie : une accusation de plus à l'écran correspond à une unité de plus
-  au profil. La sortie du résultat côté B ne déclenche plus d'alerte AFK indue.
+  au profil. La première partie de test conserve son ancien comptage doublé
+  dans le profil du compte A ; aucune statistique historique n'a été réécrite.
+  La sortie du résultat côté B ne déclenche plus d'alerte AFK indue.
 - Who is Who : salon à deux, lancement, votes des deux joueurs et révélation
   synchronisée ; départ B reflété chez A par la fin de partie.
   Une alerte `not_room_host` est apparue au lancement malgré le démarrage réussi :
@@ -86,7 +88,7 @@ Dépôt cible : `editbysan-web/latableronde`, branche `main`.
 Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
 Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiement
-`dpl_4ccYrUKpq9ucw29hXi6XTKPcULgm`, état READY). La page, le JavaScript,
+`dpl_HsZKdfMTEX7iZ8DfRAakRVvimgjd`, état READY). La page, le JavaScript,
 le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
 reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
