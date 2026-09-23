@@ -82,15 +82,23 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Sur le domaine public, connexion du nouveau compte A et lecture du profil
   validées : 250 pièces, 1 partie/1 victoire et niveau 2, cohérents avec la
   partie Chaos réalisée localement sur le même backend.
+- Sur le domaine public, A a créé le salon True Only `QYCG` ; B l'a rejoint
+  depuis le serveur local connecté au même Supabase. Écriture des anecdotes,
+  vote et classement final synchronisés sur les deux clients : A premier
+  (2 points), B second (0 point). Les deux joueurs ont quitté la partie.
+- L'onglet Badges du profil A s'affiche sur le domaine public, avec les trois
+  catégories et leurs défis verrouillés. Aucune réclamation n'a été possible
+  car aucun badge de ce compte n'est encore débloqué.
 
 ## Vérifications encore nécessaires
 
-- Badges Liars Bar et comportement des récompenses en cas de forfait.
+- Déblocage/réclamation des badges Liars Bar et comportement des récompenses
+  en cas de forfait.
 - Reproduction éventuelle de l'ancienne alerte `not_room_host` dans Who is Who.
 - Dead 21 et Photo Roulette : code backend/frontend présent mais aucun accès
   dans le sélecteur de jeux de la version fournie ; ne pas les annoncer jouables.
-- Partie complète à deux directement sur le domaine public (tests à deux
-  réalisés sur le serveur local avec le même backend Supabase). La liaison Git
+- Partie complète avec les deux joueurs directement sur le domaine public
+  (une partie a été validée avec A sur Vercel et B en local). La liaison Git
   automatique est écartée par choix de l'utilisateur. Les deux nouveaux comptes
   de test existent encore dans Auth ; aucun compte n'a été supprimé.
 
