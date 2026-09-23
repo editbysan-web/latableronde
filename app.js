@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-09-23-restore-v2";
+const APP_BUILD_VERSION = "2026-09-23-restore-v3";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
@@ -3394,8 +3394,8 @@ function renderTrueSettings() {
   return `
     <div class="true-lobby-intro">
       <strong>True Only</strong>
-      <p>Ã‰cris une vraie anecdote et une fausse. Les autres devront retrouver l'auteur et dÃ©masquer la vÃ©ritÃ©.</p>
-      <p>Une fois validÃ©es, tes anecdotes sont verrouillÃ©es.</p>
+      <p>Écris une vraie anecdote et une fausse. Les autres devront retrouver l'auteur et démasquer la vérité.</p>
+      <p>Une fois validées, tes anecdotes sont verrouillées.</p>
     </div>
   `;
 }
@@ -4411,7 +4411,7 @@ function renderTrueOnly() {
   renderTrueTimer();
   const roundTotal = Math.max(1, trueState.phrases?.length || trueState.playerIds?.length * 2 || 1);
   $("#true-round").textContent = trueState.status === "writing"
-    ? "Ã‰criture"
+    ? "Écriture"
     : `Phrase ${Number(trueState.currentIndex || 0) + 1}/${roundTotal}`;
   if (trueState.status === "writing") return renderTrueWriting(trueState);
   if (trueState.status === "voting") return renderTrueVoting(trueState);
@@ -4430,14 +4430,14 @@ function renderTrueWriting(trueState) {
   }
   $("#true-stage").innerHTML = mine ? `
     <div class="true-card">
-      <span class="true-kicker">Anecdotes envoyÃ©es</span>
+      <span class="true-kicker">Anecdotes envoyées</span>
       <h2>En attente des autres joueurs</h2>
-      <p>${submitted}/${total} joueurs ont validÃ©.</p>
+      <p>${submitted}/${total} joueurs ont validé.</p>
     </div>
   ` : `
     <form class="true-card true-write-form" id="true-write-form">
-      <span class="true-kicker">Phase d'Ã©criture</span>
-      <h2>Une vÃ©ritÃ©. Un mensonge.</h2>
+      <span class="true-kicker">Phase d'écriture</span>
+      <h2>Une vérité. Un mensonge.</h2>
       <label>Vraie anecdote<textarea id="true-real" maxlength="160" required></textarea></label>
       <label>Fausse anecdote<textarea id="true-fake" maxlength="160" required></textarea></label>
       <button class="primary true-primary" type="submit">Valider mes anecdotes</button>
@@ -4449,7 +4449,7 @@ function renderTrueWriting(trueState) {
     const realText = cleanLogText($("#true-real").value, "");
     const fakeText = cleanLogText($("#true-fake").value, "");
     if (realText.length < 12 || fakeText.length < 12) {
-      showMessage("Ã‰cris une anecdote un peu plus complÃ¨te.");
+      showMessage("Écris une anecdote un peu plus complète.");
       return;
     }
     await submitTrueEntries(realText, fakeText);
@@ -4489,13 +4489,13 @@ function renderTrueVoting(trueState) {
   }
   $("#true-stage").innerHTML = `
     <div class="true-card true-phrase-card">
-      <span class="true-kicker">Ã€ qui est cette phrase ?</span>
+      <span class="true-kicker">À qui est cette phrase ?</span>
       <h2>${cleanLogText(phrase?.text || "Phrase introuvable")}</h2>
       ${myVote ? "" : `<div class="true-truth-row compact">
         <button type="button" data-true-truth="true">Vrai</button>
         <button type="button" data-true-truth="false">Faux</button>
       </div>`}
-      ${myVote ? "<p>Vote verrouillÃ©. Attente des autres joueurs.</p>" : ""}
+      ${myVote ? "<p>Vote verrouillé. Attente des autres joueurs.</p>" : ""}
     </div>
   `;
   $("#true-actions").innerHTML = myVote ? "" : `
@@ -4521,7 +4521,7 @@ function renderTrueReveal(trueState) {
   $("#true-stage").innerHTML = `
     <div class="true-card true-reveal-card">
       <span class="true-kicker">${phrase?.truth ? "Vrai" : "Faux"}</span>
-      <h2>C'Ã©tait la phrase Ã  ${cleanText(names[phrase?.ownerId] || "Joueur")}</h2>
+      <h2>C'était la phrase à ${cleanText(names[phrase?.ownerId] || "Joueur")}</h2>
       <p>${cleanLogText(phrase?.text || "")}</p>
       <div class="true-vote-list">${resultLines || "<span>Aucun vote</span>"}</div>
     </div>
