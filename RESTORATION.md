@@ -31,6 +31,9 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   synchronisée ; départ B reflété chez A par la fin de partie.
   Une alerte `not_room_host` est apparue au lancement malgré le démarrage réussi :
   anomalie à reproduire et diagnostiquer avant validation complète.
+- True Only : salon à deux, lancement, anecdotes des deux joueurs, votes,
+  révélations et classement final synchronisés. Les libellés accentués ont été
+  corrigés sans modifier les règles ; vérification de l'affichage local.
 - Blackjack : création et lancement solo, table affichée. Compte B sans pièces
   (0 confirmé en SQL) ; aucune manche complète validée.
 - Publication Realtime vérifiée en SQL : `public.rooms` et `public.room_players`.
@@ -38,7 +41,7 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 ## Vérifications encore nécessaires
 
 - Fin de partie Liars Bar et persistance des récompenses, XP, badges.
-- Roulette russe, Chaos, Blackjack, Who is Who et True Only de bout en bout.
+- Roulette russe, Chaos, Blackjack et Who is Who de bout en bout.
 - Dead 21 et Photo Roulette : code backend/frontend présent mais aucun accès
   dans le sélecteur de jeux de la version fournie ; ne pas les annoncer jouables.
 - Upload, lecture et suppression Storage, refus d'accès entre utilisateurs.
@@ -66,18 +69,20 @@ Dépôt cible : `editbysan-web/latableronde`, branche `main`.
 Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
 Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiement
-`dpl_F3xQEVSXCJEf1NL7g397PNY3jCrj`, état READY). La page, le JavaScript,
+`dpl_4ccYrUKpq9ucw29hXi6XTKPcULgm`, état READY). La page, le JavaScript,
 le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
 reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
-`localhost:4173`. Le dépôt `main` contient le dernier correctif de cache CSS
-(`8b075b9`).
+`localhost:4173`. Le dépôt `main` contient le correctif de True Only
+(`64b3dc0`). Les fichiers privés `.env.local`, SQL et ce rapport renvoient 404
+sur le domaine public.
 
-La connexion Git automatique Vercel reste en attente : le compte GitHub lié à
-Vercel est `Sancacaprout`. Une invitation à l'accès Write sur le dépôt ciblé a
-été envoyée avec l'accord de l'utilisateur, mais doit être acceptée par ce compte.
-Les déploiements actuels ont été effectués manuellement via la CLI Vercel liée
-au projet existant.
+La connexion Git automatique Vercel n'est pas active : le compte GitHub lié à
+Vercel est `Sancacaprout`, tandis que le dépôt personnel appartient à
+`editbysan-web`. Vercel exige le propriétaire pour cette liaison ; le droit
+Write temporairement accordé à `Sancacaprout` n'a pas suffi et a été retiré.
+L'utilisateur a choisi de préserver les autres projets Vercel et de publier
+La Table Ronde manuellement via la CLI liée au projet existant.
 
 ## Retrait demandé le 23 septembre 2026
 
