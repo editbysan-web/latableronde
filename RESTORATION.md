@@ -21,7 +21,8 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   14 tables, 27 références littérales d'assets ; ce n'est pas un test d'intégration).
 - Inscription et création de profil ; confirmation d'e-mail requise.
 - Connexion de deux comptes de test ; sessions conservées après actualisation
-  et réouverture du navigateur ; pseudo du joueur A conservé.
+  des onglets existants ; pseudo du joueur A conservé. De nouveaux onglets
+  ouverts après leur fermeture ont demandé une reconnexion.
 - Lecture du profil, solde et statistiques ; solde A de 250 pièces confirmé en SQL.
 - Liars Bar normal : création d'un salon, jointure du second compte,
   affichage des deux joueurs sans actualisation, lancement sur les deux clients,
@@ -98,14 +99,15 @@ Dépôt cible : `editbysan-web/latableronde`, branche `main`.
 Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
 Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiement
-`dpl_HsZKdfMTEX7iZ8DfRAakRVvimgjd`, état READY). La page, le JavaScript,
+`dpl_2pTe4k2C7h7TZJmbv2iKf43br9h8`, état READY). La page, le JavaScript,
 le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
 reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
 `localhost:4173`. Le dépôt `main` contient les corrections de True Only,
-du profil Roulette russe et de la sortie de salon. Les fichiers privés
-`.env.local`, SQL et ce rapport renvoient 404
-sur le domaine public.
+du profil Roulette russe, de la sortie de salon et du classement Who is Who.
+La version de script `restore-v5` reste stable dans l'URL du navigateur.
+Les fichiers privés `.env.local`, SQL et ce rapport renvoient 404 sur le
+domaine public.
 
 La connexion Git automatique Vercel n'est pas active : le compte GitHub lié à
 Vercel est `Sancacaprout`, tandis que le dépôt personnel appartient à
