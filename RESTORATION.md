@@ -17,7 +17,7 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 ## Vérifications effectuées
 
 - Syntaxe JavaScript : `node --check app.js`.
-- Contrat statique : `node scripts/audit.cjs` (47 appels RPC, 75 fonctions SQL,
+- Contrat statique : `node scripts/audit.cjs` (46 appels RPC, 74 fonctions SQL,
   14 tables, 27 références littérales d'assets ; ce n'est pas un test d'intégration).
 - Inscription et création de profil ; confirmation d'e-mail requise.
 - Connexion de deux comptes de test ; sessions conservées après actualisation
@@ -43,7 +43,7 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   dans le sélecteur de jeux de la version fournie ; ne pas les annoncer jouables.
 - Upload, lecture et suppression Storage, refus d'accès entre utilisateurs.
 - Achats et équipement boutique, roue, déconnexion/reconnexion explicite.
-- URLs Auth du domaine de production, configuration et déploiement Vercel.
+- Liaison Git automatique Vercel et essais de jeu complets sur le domaine public.
 
 ## Limites de sécurité à traiter
 
@@ -65,10 +65,19 @@ Les sauvegardes, outils locaux et fichiers privés `.env` sont exclus du dépôt
 Dépôt cible : `editbysan-web/latableronde`, branche `main`.
 Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
-La connexion Git Vercel doit être vérifiée : l'ancien déploiement référence encore
-`Sancacaprout/Latableronde`. Une publication GitHub seule ne prouve pas un déploiement.
-Le code du site a été envoyé sur `main` (commit de restauration `153ed26`).
-La connexion du compte propriétaire Vercel est encore demandée dans le navigateur.
+Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiement
+`dpl_F3xQEVSXCJEf1NL7g397PNY3jCrj`, état READY). La page, le JavaScript,
+le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
+reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
+exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
+`localhost:4173`. Le dépôt `main` contient le dernier correctif de cache CSS
+(`8b075b9`).
+
+La connexion Git automatique Vercel reste en attente : le compte GitHub lié à
+Vercel est `Sancacaprout`. Une invitation à l'accès Write sur le dépôt ciblé a
+été envoyée avec l'accord de l'utilisateur, mais doit être acceptée par ce compte.
+Les déploiements actuels ont été effectués manuellement via la CLI Vercel liée
+au projet existant.
 
 ## Retrait demandé le 23 septembre 2026
 
@@ -78,6 +87,7 @@ Le script ciblé `supabase-remove-dark-market.sql` ne modifie aucune donnée jou
 Boutique normale, inventaires et roue conservés. Un contrôle de non-régression
 empêche le retour de cette fonctionnalité dans les fichiers frontend.
 Les anciennes versions restent dans Git et les sauvegardes ; aucun historique
-n'a été réécrit. Le déploiement Vercel de cette version reste à terminer.
+n'a été réécrit. Le retrait est maintenant en production ; le cache CSS a été
+actualisé et le HTML/JS public ne contient plus Dark Market.
 
 Ce document est un état intermédiaire, pas une validation complète de production.
