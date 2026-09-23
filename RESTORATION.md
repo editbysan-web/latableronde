@@ -25,7 +25,10 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Lecture du profil, solde et statistiques ; solde A de 250 pièces confirmé en SQL.
 - Liars Bar normal : création d'un salon, jointure du second compte,
   affichage des deux joueurs sans actualisation, lancement sur les deux clients,
-  carte jouée et passage de tour synchronisé, accusation soumise.
+  carte jouée et passage de tour synchronisé. Partie complète à deux : bluff,
+  accusations justes et fausse accusation, élimination naturelle de B,
+  victoire de A et gain de 250 pièces. Résultat, XP et statistiques retrouvés
+  dans les profils après retour à l'accueil.
 - Roulette russe Liars Bar : deux joueurs synchronisés, carte bluffée,
   accusation, tir à blanc et compteur de tir synchronisé. Après abandon de B,
   A a reçu 150 pièces, persistées après retour au profil. Le SQL exclut
@@ -39,9 +42,15 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   dans le profil du compte A ; aucune statistique historique n'a été réécrite.
   La sortie du résultat côté B ne déclenche plus d'alerte AFK indue.
 - Who is Who : salon à deux, lancement, votes des deux joueurs et révélation
-  synchronisée ; départ B reflété chez A par la fin de partie.
-  Une alerte `not_room_host` est apparue au lancement malgré le démarrage réussi :
-  anomalie à reproduire et diagnostiquer avant validation complète.
+  synchronisée ; partie complète de dix questions et classement final sur les
+  deux clients. Le classement comptait le dernier vote deux fois (11 au lieu
+  de 10) : corrigé et vérifié sur les deux clients après actualisation.
+  L'alerte `not_room_host` vue sur un lancement précédent ne s'est pas
+  reproduite lors de cette partie complète.
+- Liars Bar Chaos : salon à deux, carte Demon jouée et révélée sur les deux
+  clients, tir à blanc et nouveau tour synchronisés. La fin de partie reste
+  non vérifiée : les onglets de test ont été fermés et les nouvelles sessions
+  demandent une reconnexion.
 - True Only : salon à deux, lancement, anecdotes des deux joueurs, votes,
   révélations et classement final synchronisés. Les libellés accentués ont été
   corrigés sans modifier les règles ; vérification de l'affichage local.
@@ -58,7 +67,8 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 ## Vérifications encore nécessaires
 
 - Badges Liars Bar et comportement des récompenses en cas de forfait.
-- Mode normal Liars Bar, Chaos et Who is Who de bout en bout.
+- Fin de partie Chaos à deux et reproduction éventuelle de l'ancienne alerte
+  `not_room_host` dans Who is Who.
 - Dead 21 et Photo Roulette : code backend/frontend présent mais aucun accès
   dans le sélecteur de jeux de la version fournie ; ne pas les annoncer jouables.
 - Upload, lecture et suppression Storage, refus d'accès entre utilisateurs.

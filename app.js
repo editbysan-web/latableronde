@@ -7988,9 +7988,11 @@ function renderEnd() {
         totals[targetId] = Number(totals[targetId] || 0) + 1;
       });
     });
-    Object.values(whoState.votes || {}).forEach((targetId) => {
-      totals[targetId] = Number(totals[targetId] || 0) + 1;
-    });
+    if ((whoState.voteHistory || []).length < Number(whoState.currentRound || 1)) {
+      Object.values(whoState.votes || {}).forEach((targetId) => {
+        totals[targetId] = Number(totals[targetId] || 0) + 1;
+      });
+    }
     $("#ranking").innerHTML = players
       .map((player) => [player, totals[player.id] || 0])
       .sort((a, b) => b[1] - a[1])
