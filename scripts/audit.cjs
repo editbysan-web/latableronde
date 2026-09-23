@@ -10,6 +10,9 @@ const calls = new Set([...app.matchAll(/["']([a-z0-9_]+_rpc)["']/g)].map(m => m[
 const tables = new Set([...sql.matchAll(/create table if not exists public\.([a-z0-9_]+)/gi)].map(m => m[1]));
 const from = new Set([...app.matchAll(/\.from\(["']([a-z0-9_]+)["']\)/g)].map(m => m[1]));
 const errors = [];
+for (const name of ['app.js', 'index.html', 'styles.css']) {
+  if (/dark[-_ ]?market/i.test(read(name))) errors.push('Removed feature still present: ' + name);
+}
 for (const name of calls) if (!functions.has(name)) errors.push('Missing RPC: ' + name);
 for (const name of from) if (!tables.has(name)) errors.push('Missing table: ' + name);
 const references = new Set();

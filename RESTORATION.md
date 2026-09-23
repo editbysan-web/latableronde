@@ -70,4 +70,14 @@ La connexion Git Vercel doit être vérifiée : l'ancien déploiement référenc
 Le code du site a été envoyé sur `main` (commit de restauration `153ed26`).
 La connexion du compte propriétaire Vercel est encore demandée dans le navigateur.
 
+## Retrait demandé le 23 septembre 2026
+
+Dark Market supprimé : bouton, fenêtre, styles, état JavaScript, événements et
+appel RPC retirés. La fonction Supabase a été supprimée et son absence vérifiée.
+Le script ciblé `supabase-remove-dark-market.sql` ne modifie aucune donnée joueur.
+Boutique normale, inventaires et roue conservés. Un contrôle de non-régression
+empêche le retour de cette fonctionnalité dans les fichiers frontend.
+Les anciennes versions restent dans Git et les sauvegardes ; aucun historique
+n'a été réécrit. Le déploiement Vercel de cette version reste à terminer.
+
 Ce document est un état intermédiaire, pas une validation complète de production.

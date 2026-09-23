@@ -460,38 +460,6 @@ input:focus {
   font-weight: 950;
 }
 
-.dark-market-open {
-  min-height: 56px;
-  display: grid;
-  gap: 2px;
-  place-items: center;
-  border-radius: 8px;
-  border: 1px solid rgba(159, 93, 255, .44);
-  color: #f3eaff;
-  background:
-    radial-gradient(circle at 24% 20%, rgba(192, 142, 255, .24), transparent 26%),
-    linear-gradient(135deg, #251933, #623292 58%, #32164d);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .1),
-    0 12px 28px rgba(95, 48, 142, .24),
-    0 0 22px rgba(159, 93, 255, .14);
-  font-weight: 950;
-}
-
-.dark-market-open small {
-  color: rgba(244, 232, 255, .76);
-  font-size: 12px;
-}
-
-.dark-market-open.closed {
-  opacity: .58;
-  filter: grayscale(.55);
-}
-
-.dark-market-open:disabled {
-  cursor: not-allowed;
-}
-
 .profile-open {
   border: 1px solid rgba(105, 147, 205, .34);
   color: #f5f7fb;
@@ -952,48 +920,6 @@ button.shop-card-media:focus-visible {
   width: 46px;
   height: 46px;
   touch-action: manipulation;
-}
-
-.dark-market-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 176;
-  display: grid;
-  place-items: center;
-  padding: 18px;
-  background: rgba(5, 3, 10, .78);
-  backdrop-filter: blur(10px);
-}
-
-.dark-market-panel {
-  position: relative;
-  width: min(92vw, 520px);
-  display: grid;
-  gap: 10px;
-  padding: 24px;
-  border-radius: 14px;
-  border: 1px solid rgba(172, 103, 255, .42);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(159, 93, 255, .24), transparent 48%),
-    linear-gradient(180deg, rgba(24, 16, 34, .98), rgba(8, 7, 12, .98));
-  box-shadow: 0 28px 80px rgba(0, 0, 0, .68), 0 0 34px rgba(159, 93, 255, .16);
-}
-
-.dark-market-panel h2 {
-  margin: 0;
-  color: #f4e9ff;
-}
-
-.dark-market-panel p {
-  margin: 0;
-  color: rgba(244, 232, 255, .75);
-  font-weight: 800;
-}
-
-.dark-market-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
 }
 
 .lucky-wheel-panel {
@@ -3295,40 +3221,13 @@ button.shop-card-media:focus-visible {
   color: rgba(255, 255, 255, .72);
 }
 
-.spectator-panel button,
-.dark-market-button {
+.spectator-panel button {
   border: 1px solid rgba(232, 194, 91, .35);
   border-radius: 10px;
   padding: 8px 10px;
   font-weight: 900;
   color: #111;
   background: linear-gradient(135deg, #f0cf75, #bd7b2c);
-}
-
-.dark-market-entry {
-  border-color: rgba(152, 91, 255, .34);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(131, 72, 255, .24), transparent 62%),
-    rgba(13, 10, 22, .72);
-}
-
-.dark-market-button {
-  width: 100%;
-  display: grid;
-  gap: 4px;
-  color: #f4ecff;
-  background: linear-gradient(135deg, #48205f, #8f43d6);
-  box-shadow: 0 0 26px rgba(148, 77, 255, .22);
-}
-
-.dark-market-button.closed {
-  opacity: .62;
-  color: rgba(255, 255, 255, .74);
-  background: linear-gradient(135deg, #25252c, #48424d);
-}
-
-.dark-market-button small {
-  color: rgba(255, 255, 255, .74);
 }
 
 .shop-sell-button {

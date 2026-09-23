@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-09-21-restore";
+const APP_BUILD_VERSION = "2026-09-23-restore-v2";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
@@ -748,8 +748,6 @@ const state = {
     busy: false,
     previewClosedAt: 0,
     blockClicksUntil: 0,
-    darkMarket: null,
-    darkMarketLoading: false,
   },
   luckyWheel: {
     busy: false,
@@ -1112,12 +1110,10 @@ function renderHome() {
     pseudoInput.value = state.user?.pseudo || "";
   }
   updateHomeHeroImage();
-  renderDarkMarketHomeButton();
   renderJuneGiftButton();
   if (db && state.user?.id && !state.juneGift.loading && Date.now() - Number(state.juneGift.loadedAt || 0) > 45000) {
     loadJuneGiftState();
   }
-  if (db && !state.shop.darkMarket && !state.shop.darkMarketLoading) loadDarkMarketState();
 }
 
 function renderJuneGiftButton() {
@@ -1227,20 +1223,6 @@ async function claimJuneGift() {
   }
 }
 
-function renderDarkMarketHomeButton() {
-  const button = $("#open-dark-market");
-  if (!button) return;
-  const darkMarket = state.shop.darkMarket || {};
-  const open = Boolean(darkMarket.open);
-  button.classList.toggle("open", open);
-  button.classList.toggle("closed", !open);
-  button.disabled = !open;
-  button.innerHTML = `
-    <span>◆ Dark Market</span>
-    <small>${open ? "Marché nocturne ouvert" : "Ouvert de 22h à 05h"}</small>
-  `;
-}
-
 function updateHomeHeroImage() {
   const hero = $(".hero");
   if (!hero) return;
@@ -1272,50 +1254,6 @@ async function openShop() {
   renderShop();
 }
 
-async function loadDarkMarketState() {
-  if (!db || state.shop.darkMarketLoading) return;
-  state.shop.darkMarketLoading = true;
-  try {
-    const { data, error } = await db.rpc("get_dark_market_state_rpc");
-    if (error) {
-      if (!isMissingRpc(error)) console.warn("Dark Market state failed:", error.message || error);
-      return;
-    }
-    state.shop.darkMarket = data || null;
-    renderDarkMarketHomeButton();
-  } catch (error) {
-    console.warn("Dark Market state failed:", error);
-  } finally {
-    state.shop.darkMarketLoading = false;
-  }
-}
-
-async function openDarkMarket() {
-  if (!state.shop.darkMarket) await loadDarkMarketState();
-  const darkMarket = state.shop.darkMarket || {};
-  if (!darkMarket.open) {
-    showMessage("Le Dark Market est fermé. Il ouvre de 22h à 05h, heure serveur France.");
-    return;
-  }
-  closeDarkMarket();
-  const modal = document.createElement("div");
-  modal.className = "dark-market-modal";
-  modal.id = "dark-market-modal";
-  modal.innerHTML = `
-    <section class="dark-market-panel" role="dialog" aria-modal="true" aria-label="Dark Market">
-      <button class="icon-btn dark-market-close" type="button" aria-label="Fermer">×</button>
-      <span class="small-label">Marché nocturne</span>
-      <h2>Dark Market</h2>
-      <p>Produits exclusifs bientôt disponibles.</p>
-    </section>
-  `;
-  document.body.appendChild(modal);
-}
-
-function closeDarkMarket() {
-  $("#dark-market-modal")?.remove();
-}
-
 function closeShop() {
   const modal = $("#shop-modal");
   if (!modal) return;
@@ -1327,7 +1265,6 @@ function closeShop() {
 function closeTransientModals() {
   closeShop();
   closeLuckyWheel();
-  closeDarkMarket();
   closeLiarsProfile();
   closeAfkHostPrompt();
   closeModeRules();
@@ -8761,10 +8698,6 @@ document.addEventListener("click", (event) => {
     closeModeRules();
     return;
   }
-  if (event.target?.id === "dark-market-modal" || event.target.closest(".dark-market-close")) {
-    closeDarkMarket();
-    return;
-  }
 
   if (event.target.closest("[data-close-transient]")) {
     closeTransientModals();
@@ -8782,10 +8715,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  if (event.target.closest("[data-open-dark-market]")) {
-    openDarkMarket();
-    return;
-  }
 
   if (event.target.closest("[data-open-profile]")) {
     openLiarsProfile(state.user?.id);

@@ -3043,33 +3043,6 @@ begin
 end;
 $$;
 
-create or replace function public.get_dark_market_state_rpc()
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_uid uuid := (select auth.uid());
-  v_now timestamp with time zone := clock_timestamp();
-  v_local time := (clock_timestamp() at time zone 'Europe/Paris')::time;
-  v_open boolean;
-begin
-  if v_uid is null then
-    raise exception 'not_authenticated';
-  end if;
-  v_open := v_local >= time '22:00' or v_local < time '05:00';
-  return jsonb_build_object(
-    'open', v_open,
-    'serverTime', v_now,
-    'timezone', 'Europe/Paris',
-    'opensAt', '22:00',
-    'closesAt', '05:00',
-    'products', '[]'::jsonb
-  );
-end;
-$$;
-
 create or replace function public.blackjack_random_card()
 returns jsonb
 language plpgsql
@@ -4738,7 +4711,6 @@ begin
       'buy_shop_item_rpc',
       'equip_shop_item_rpc',
       'sell_shop_item_rpc',
-      'get_dark_market_state_rpc',
       'blackjack_random_card',
       'blackjack_card_value',
       'blackjack_hand_score',
@@ -4821,7 +4793,6 @@ grant execute on function public.dead21_finalize_deck_intro_rpc(uuid, text) to a
 grant execute on function public.buy_shop_item_rpc(text, text) to authenticated;
 grant execute on function public.equip_shop_item_rpc(text, text) to authenticated;
 grant execute on function public.sell_shop_item_rpc(text, text) to authenticated;
-grant execute on function public.get_dark_market_state_rpc() to authenticated;
 grant execute on function public.get_lucky_wheel_state_rpc() to authenticated;
 grant execute on function public.spin_lucky_wheel_rpc() to authenticated;
 grant execute on function public.get_june_5_gift_state_rpc() to authenticated;
