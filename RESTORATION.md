@@ -20,9 +20,10 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Contrat statique : `node scripts/audit.cjs` (46 appels RPC, 74 fonctions SQL,
   14 tables, 27 références littérales d'assets ; ce n'est pas un test d'intégration).
 - Inscription et création de profil ; confirmation d'e-mail requise.
-- Connexion de deux comptes de test ; sessions conservées après actualisation
-  des onglets existants ; pseudo du joueur A conservé. De nouveaux onglets
-  ouverts après leur fermeture ont demandé une reconnexion.
+- Deux nouveaux comptes de test confirmés créés dans Supabase Auth et connectés
+  sur deux origines locales indépendantes. Déconnexion/reconnexion explicite du
+  joueur B réussie ; session et profil du joueur A conservés après actualisation.
+  Les mots de passe de ces comptes temporaires n'ont pas été enregistrés.
 - Lecture du profil, solde et statistiques ; solde A de 250 pièces confirmé en SQL.
 - Liars Bar normal : création d'un salon, jointure du second compte,
   affichage des deux joueurs sans actualisation, lancement sur les deux clients,
@@ -48,10 +49,12 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   de 10) : corrigé et vérifié sur les deux clients après actualisation.
   L'alerte `not_room_host` vue sur un lancement précédent ne s'est pas
   reproduite lors de cette partie complète.
-- Liars Bar Chaos : salon à deux, carte Demon jouée et révélée sur les deux
-  clients, tir à blanc et nouveau tour synchronisés. La fin de partie reste
-  non vérifiée : les onglets de test ont été fermés et les nouvelles sessions
-  demandent une reconnexion.
+- Liars Bar Chaos : après le test initial de carte Demon et de tour synchronisé,
+  partie complète à deux dans le salon SWEU. Accusation juste de A, puis deux
+  accusations erronées de B, tirs synchronisés et élimination naturelle de B.
+  Classement final identique sur les deux clients : A vainqueur (+250 pièces),
+  B perdant. Après actualisation, A avait 250 pièces, 1 partie/1 victoire et
+  B avait 0 pièce, 1 partie/0 victoire, 3 tirs/1 mort ; XP persistée aussi.
 - True Only : salon à deux, lancement, anecdotes des deux joueurs, votes,
   révélations et classement final synchronisés. Les libellés accentués ont été
   corrigés sans modifier les règles ; vérification de l'affichage local.
@@ -69,19 +72,27 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   un utilisateur authentifié et un chemin dont le deuxième segment est son UID,
   comme le chemin construit dans `app.js`. SELECT autorise tout utilisateur
   authentifié pour ce bucket ; les URLs publiques restent lisibles sans compte.
+- Storage testé avec un seul fichier texte synthétique dans le chemin du joueur
+  A : import, lecture et mise à jour réussis ; modification par B rejetée par
+  RLS, lecture par B autorisée (bucket public), suppression par B de 0 objet,
+  suppression par A de 1 objet. Une lecture HTTP directe sans cache a ensuite
+  renvoyé `NoSuchKey`. Le navigateur pouvait encore afficher l'ancien contenu
+  depuis son cache. Le fichier témoin a été supprimé définitivement avec
+  l'accord de l'utilisateur ; aucune photo personnelle n'a été touchée.
+- Sur le domaine public, connexion du nouveau compte A et lecture du profil
+  validées : 250 pièces, 1 partie/1 victoire et niveau 2, cohérents avec la
+  partie Chaos réalisée localement sur le même backend.
 
 ## Vérifications encore nécessaires
 
 - Badges Liars Bar et comportement des récompenses en cas de forfait.
-- Fin de partie Chaos à deux et reproduction éventuelle de l'ancienne alerte
-  `not_room_host` dans Who is Who.
+- Reproduction éventuelle de l'ancienne alerte `not_room_host` dans Who is Who.
 - Dead 21 et Photo Roulette : code backend/frontend présent mais aucun accès
   dans le sélecteur de jeux de la version fournie ; ne pas les annoncer jouables.
-- Upload, lecture et suppression Storage, refus d'accès entre utilisateurs.
-- Déconnexion/reconnexion explicite et essais de jeu complets sur le domaine
-  public. La liaison Git automatique est écartée par choix de l'utilisateur.
-  Les deux comptes de test existent encore dans Auth, mais leurs sessions
-  navigateur ne sont plus disponibles ; aucun mot de passe n'a été réinitialisé.
+- Partie complète à deux directement sur le domaine public (tests à deux
+  réalisés sur le serveur local avec le même backend Supabase). La liaison Git
+  automatique est écartée par choix de l'utilisateur. Les deux nouveaux comptes
+  de test existent encore dans Auth ; aucun compte n'a été supprimé.
 
 ## Limites de sécurité à traiter
 
@@ -91,6 +102,9 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   La restauration des permissions ne constitue pas une protection anti-triche complète.
 - Une victoire par forfait donne 150 pièces mais n'incrémente ni partie jouée
   ni XP ; vérifier si cette asymétrie est voulue avant de modifier la règle.
+- Dans Chaos, deux cartes honnêtes de A accusées à tort par B ont augmenté la
+  statistique libellée « Bluffs réussis » et donné des pièces. C'est la règle
+  actuelle du jeu ; confirmer le libellé/la règle avant toute modification.
 - Les politiques de lecture des salons sont larges pour les comptes authentifiés.
 
 ## Exploitation locale
