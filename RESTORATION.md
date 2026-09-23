@@ -64,6 +64,11 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
   solde et équipement conservés après actualisation. Le compte B affichait
   toujours zéro pièce et aucun achat.
 - Publication Realtime vérifiée en SQL : `public.rooms` et `public.room_players`.
+- Storage vérifié dans le tableau de bord Supabase : bucket `photo-roulette`
+  présent et public, quatre policies actives. INSERT, UPDATE et DELETE exigent
+  un utilisateur authentifié et un chemin dont le deuxième segment est son UID,
+  comme le chemin construit dans `app.js`. SELECT autorise tout utilisateur
+  authentifié pour ce bucket ; les URLs publiques restent lisibles sans compte.
 
 ## Vérifications encore nécessaires
 
@@ -75,6 +80,8 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Upload, lecture et suppression Storage, refus d'accès entre utilisateurs.
 - Déconnexion/reconnexion explicite et essais de jeu complets sur le domaine
   public. La liaison Git automatique est écartée par choix de l'utilisateur.
+  Les deux comptes de test existent encore dans Auth, mais leurs sessions
+  navigateur ne sont plus disponibles ; aucun mot de passe n'a été réinitialisé.
 
 ## Limites de sécurité à traiter
 
