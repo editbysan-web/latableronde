@@ -18,7 +18,7 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 
 - Syntaxe JavaScript : `node --check app.js`.
 - Contrat statique : `node scripts/audit.cjs` (46 appels RPC, 74 fonctions SQL,
-  14 tables, 27 références littérales d'assets ; ce n'est pas un test d'intégration).
+  14 tables, 29 références littérales d'assets ; ce n'est pas un test d'intégration).
 - Inscription et création de profil ; confirmation d'e-mail requise.
 - Deux nouveaux comptes de test confirmés créés dans Supabase Auth et connectés
   sur deux origines locales indépendantes. Déconnexion/reconnexion explicite du
@@ -128,13 +128,13 @@ Dépôt cible : `editbysan-web/latableronde`, branche `main`.
 Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
 Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiement
-`dpl_2pTe4k2C7h7TZJmbv2iKf43br9h8`, état READY). La page, le JavaScript,
+`dpl_BTvChvnJsuzrdnL2UqphoV7A7th6`, état READY). La page, le JavaScript,
 le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
 reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
 `localhost:4173`. Le dépôt `main` contient les corrections de True Only,
 du profil Roulette russe, de la sortie de salon et du classement Who is Who.
-La version de script `restore-v5` reste stable dans l'URL du navigateur.
+La version de script `restore-v6` est chargée sur le domaine public.
 Les fichiers privés `.env.local`, SQL et ce rapport renvoient 404 sur le
 domaine public.
 
@@ -155,5 +155,24 @@ empêche le retour de cette fonctionnalité dans les fichiers frontend.
 Les anciennes versions restent dans Git et les sauvegardes ; aucun historique
 n'a été réécrit. Le retrait est maintenant en production ; le cache CSS a été
 actualisé et le HTML/JS public ne contient plus Dark Market.
+
+## Audit visuel et images du 24 septembre 2026
+
+- Pages et fenêtres principales contrôlées en local aux largeurs 375 et 1280 px :
+  accueil, sélecteur de jeux, choix de mode Liars Bar, boutique, roue, profil
+  et badges. Aucun débordement horizontal ni image brisée observé.
+- Image cassée du jeton de mort par défaut identifiée dans la boutique : les
+  chemins des images `Joker`, `Life` et `Mort` pointent désormais vers les
+  fichiers présents dans `Image liarsbar/`. Le contrôle statique vérifie aussi
+  ces références. Correction poussée sur `main` (`157f12b`) et publiée
+  manuellement sur Vercel (`dpl_BTvChvnJsuzrdnL2UqphoV7A7th6`).
+- Sur `latableronde.vercel.app`, le script `restore-v6` est chargé. Dans la
+  boutique du compte de test, le jeton de mort charge en 1024 px ; aucune des
+  68 images alors présentes dans le DOM n'est brisée. L'affichage de la
+  boutique a été contrôlé visuellement.
+- Un balayage HTTP trop rapide a temporairement déclenché le contrôle de
+  sécurité Vercel. L'accès normal au site a ensuite refonctionné ; aucune
+  règle de pare-feu n'a été modifiée. Les autres parcours de jeu en production
+  ne sont pas validés par cet audit visuel.
 
 Ce document est un état intermédiaire, pas une validation complète de production.
