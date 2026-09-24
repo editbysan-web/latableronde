@@ -2430,7 +2430,7 @@ function setAuthMode(mode) {
   $$(".auth-tab").forEach((button) => {
     button.classList.toggle("active", button.dataset.authMode === mode);
   });
-  setNotice(isSignup ? "Pseudo, email et mot de passe requis." : "Email et mot de passe suffisent.");
+  setNotice(isSignup ? "Pseudo, email et mot de passe requis. Aucune confirmation par email." : "Email et mot de passe suffisent.");
 }
 
 async function authWithPassword(action) {
@@ -2468,14 +2468,14 @@ async function authWithPassword(action) {
   if (action === "signup" && (!data.user || !data.session)) {
     const login = await db.auth.signInWithPassword({ email, password });
     if (login.error || !login.data?.session) {
-      setNotice("Compte cree. Si Supabase demande une verification email, connecte-toi apres validation.");
+      setNotice("Inscription non finalisee. Reessaie ou contacte l'administrateur.");
       return;
     }
     data = login.data;
   }
 
   if (!data.user || !data.session) {
-    setNotice("Connexion refusee: compte introuvable ou email non confirme.");
+    setNotice("Connexion refusee: verifie ton email et ton mot de passe.");
     return;
   }
 
@@ -2495,7 +2495,7 @@ async function authWithPassword(action) {
 function requireSignedIn() {
   if (state.user?.id) return true;
   go("auth");
-  setNotice("Connecte-toi d'abord avec un compte verifie.");
+  setNotice("Connecte-toi d'abord avec ton compte.");
   return false;
 }
 

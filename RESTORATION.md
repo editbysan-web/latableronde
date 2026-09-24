@@ -19,7 +19,8 @@ il remplace des fonctions/policies et resynchronise les pseudos depuis Auth.
 - Syntaxe JavaScript : `node --check app.js`.
 - Contrat statique : `node scripts/audit.cjs` (46 appels RPC, 74 fonctions SQL,
   14 tables, 29 références littérales d'assets ; ce n'est pas un test d'intégration).
-- Inscription et création de profil ; confirmation d'e-mail requise.
+- Inscription et création de profil ; depuis le 24 septembre, la confirmation
+  d'e-mail est désactivée dans Supabase Auth pour les nouveaux comptes.
 - Deux nouveaux comptes de test confirmés créés dans Supabase Auth et connectés
   sur deux origines locales indépendantes. Déconnexion/reconnexion explicite du
   joueur B réussie ; session et profil du joueur A conservés après actualisation.
@@ -134,7 +135,7 @@ reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
 `localhost:4173`. Le dépôt `main` contient les corrections de True Only,
 du profil Roulette russe, de la sortie de salon et du classement Who is Who.
-La version de script `restore-v6` est chargée sur le domaine public.
+La version de script `restore-v7` est chargée sur le domaine public.
 Les fichiers privés `.env.local`, SQL et ce rapport renvoient 404 sur le
 domaine public.
 
@@ -176,3 +177,15 @@ actualisé et le HTML/JS public ne contient plus Dark Market.
   ne sont pas validés par cet audit visuel.
 
 Ce document est un état intermédiaire, pas une validation complète de production.
+
+## Inscription sans confirmation d'e-mail (24 septembre 2026)
+
+Le réglage `Confirm email` du projet Supabase `yhdafozbxydqemphdqvb` a été
+désactivé dans `Authentication > Sign In / Providers > User Signups`, puis
+vérifié après rechargement. Le site demande toujours pseudo, adresse e-mail et
+mot de passe ; il ne demande plus de clic sur un e-mail de confirmation.
+Une adresse non vérifiée est considérée comme confirmée par Supabase pour
+l'authentification : elle ne prouve pas que son utilisateur en est propriétaire.
+Un test d'inscription par l'API publique a renvoyé immédiatement une session et
+un utilisateur auto-confirmé. Le compte temporaire créé pour ce test a ensuite
+été supprimé et sa disparition vérifiée dans Supabase Auth.
