@@ -129,7 +129,7 @@ Dépôt cible : `editbysan-web/latableronde`, branche `main`.
 Ancien projet Vercel à réutiliser : `latableronde`, domaine
 `latableronde.vercel.app`, espace `ototosan42-3509s-projects`.
 Le site restauré est déployé sur `https://latableronde.vercel.app` (déploiement
-`dpl_BTvChvnJsuzrdnL2UqphoV7A7th6`, état READY). La page, le JavaScript,
+`dpl_H9EoMSR2Zg6VKnBNnSEe47wcuXTQ`, état READY). La page, le JavaScript,
 le CSS et plusieurs images répondent en HTTP 200 ; un essai de connexion invalide
 reçoit la réponse attendue de Supabase Auth. URL de site et trois redirections
 exactes configurées dans Supabase Auth : domaine public, `127.0.0.1:4173` et
@@ -184,6 +184,8 @@ Le réglage `Confirm email` du projet Supabase `yhdafozbxydqemphdqvb` a été
 désactivé dans `Authentication > Sign In / Providers > User Signups`, puis
 vérifié après rechargement. Le site demande toujours pseudo, adresse e-mail et
 mot de passe ; il ne demande plus de clic sur un e-mail de confirmation.
+Les textes d'authentification ont été ajustés dans le script `restore-v7`,
+publié manuellement sur Vercel (`dpl_H9EoMSR2Zg6VKnBNnSEe47wcuXTQ`).
 Une adresse non vérifiée est considérée comme confirmée par Supabase pour
 l'authentification : elle ne prouve pas que son utilisateur en est propriétaire.
 Un test d'inscription par l'API publique a renvoyé immédiatement une session et
