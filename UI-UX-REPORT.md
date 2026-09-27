@@ -2,6 +2,16 @@
 
 Version : 2026-09-24-design-v1. Vérifications poursuivies le 27 septembre 2026.
 
+## Publication
+- URL : https://latableronde.vercel.app/?appv=2026-09-24-design-v1
+- Cible : production ; statut Vercel READY.
+- Commit du code déployé : d1a01bd.
+- Déploiement : dpl_DYXMXnhcgp6QvU5fMBjmRnHr4uGJ.
+- Projet statique HTML/CSS/JavaScript, framework Vercel Other.
+- Publication manuelle avec équipe explicite ototosan42-3509s-projects. Le premier essai sans équipe explicite a été refusé ; aucun droit n'a été modifié.
+- Contrôle navigateur après publication : nouvelle feuille interface.css chargée, session restaurée, accueil affiché, aucune erreur console ni image visible cassée, aucun débordement horizontal.
+- Pas de monitoring serveur ni de drains ajoutés. Pas d'analyse exhaustive des journaux historiques.
+
 ## Visuel
 - Palette commune vert sombre, crème et accents dorés pour l'accueil, les salons et les modales.
 - Photos et illustrations existantes conservées. Aucun visuel généré.
