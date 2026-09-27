@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-09-23-restore-v5";
+const APP_BUILD_VERSION = "2026-09-24-design-v1";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
@@ -1092,7 +1092,7 @@ function showMessage(message) {
     setNotice(message);
     return;
   }
-  window.alert(message);
+  window.LTR_UI.notify(message);
 }
 
 function renderAccountLabel() {
@@ -1233,6 +1233,7 @@ function updateHomeHeroImage() {
 function startHomeHeroSlideshow() {
   clearInterval(state.homeHero.timer);
   updateHomeHeroImage();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   state.homeHero.timer = setInterval(() => {
     state.homeHero.index = (state.homeHero.index + 1) % 3;
     updateHomeHeroImage();
@@ -2093,7 +2094,7 @@ function renderLuckyWheel() {
   stage.innerHTML = `
     <div class="lucky-wheel-wrap">
       <i class="lucky-wheel-pointer"></i>
-      <canvas class="lucky-wheel-canvas" id="lucky-wheel-canvas" width="520" height="520" style="--wheel-rotation:${state.luckyWheel.rotation}deg"></canvas>
+      <canvas class="lucky-wheel-canvas" id="lucky-wheel-canvas" width="520" height="520" data-ui-style="--wheel-rotation:${state.luckyWheel.rotation}deg"></canvas>
     </div>
     <div class="lucky-wheel-status">${cleanText(status)}</div>
     ${result ? `<div class="lucky-wheel-result ${resultFresh ? "fresh" : ""}">${result.coins ? `<img src="./Boutique/piece.png" alt="" />` : ""}<strong>Vous avez gagné : ${cleanText(result.label || "Bonus")}</strong></div>` : ""}
@@ -2429,7 +2430,9 @@ function setAuthMode(mode) {
   $("#auth-submit").textContent = isSignup ? "Creer mon compte" : "Connexion";
   $$(".auth-tab").forEach((button) => {
     button.classList.toggle("active", button.dataset.authMode === mode);
+    button.setAttribute("aria-pressed", String(button.dataset.authMode === mode));
   });
+  $("#password").autocomplete = isSignup ? "new-password" : "current-password";
   setNotice(isSignup ? "Pseudo, email et mot de passe requis. Aucune confirmation par email." : "Email et mot de passe suffisent.");
 }
 
@@ -3718,7 +3721,7 @@ function renderProfileBadges() {
                 ${renderBadgeImage(badge)}
                 <strong>${cleanText(badge.name)}</strong>
                 <small>${cleanText(badge.description)}</small>
-                <div class="badge-progress"><i style="width:${percent}%"></i></div>
+                <div class="badge-progress"><i data-ui-style="width:${percent}%"></i></div>
                 <span>${progress}/${progressMax}</span>
                 ${badge.state === "LOCKED" ? "<b class=\"badge-lock\">🔒</b>" : ""}
                 ${canClaimBadge ? `<em>À réclamer</em>` : ""}
@@ -3846,7 +3849,7 @@ function renderLiarsProfileModal() {
         <span>${profile.liarsXp}/${xpNeed} XP</span>
       </div>
     </section>
-    <div class="profile-xp"><i style="width:${xpPercent}%"></i></div>
+    <div class="profile-xp" role="progressbar" aria-label="Progression vers le prochain niveau" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${xpPercent}"><i data-ui-style="width:${xpPercent}%"></i></div>
     <nav class="profile-tabs">
       ${LIARS_PROFILE_TABS.map((item) => `<button type="button" data-profile-tab="${item.id}" class="${item.id === tab ? "active" : ""}">${item.label}</button>`).join("")}
     </nav>
@@ -4201,9 +4204,9 @@ function renderWhoReveal(whoState) {
       <div class="who-links">
         ${voteLines.length ? voteLines.map((line) => `
           <span>
-            <b style="--who-name-color:${whoPlayerColor(line.voterId, players)}">${cleanText(line.voter)}</b>
+            <b data-ui-style="--who-name-color:${whoPlayerColor(line.voterId, players)}">${cleanText(line.voter)}</b>
             a vote pour
-            <b style="--who-name-color:${whoPlayerColor(line.targetId, players)}">${cleanText(line.target)}</b>
+            <b data-ui-style="--who-name-color:${whoPlayerColor(line.targetId, players)}">${cleanText(line.target)}</b>
           </span>
         `).join("") : "<span>Aucun vote sur cette question</span>"}
       </div>
@@ -5527,7 +5530,7 @@ function renderLiarsOverlay(reveal, seatByPlayer = {}) {
     const originStyle = dead21ScoreRevealOriginStyle(seatByPlayer[reveal.playerId]);
     overlay.className = `liars-overlay active dead21-score-reveal-overlay score-phase-${reveal.scorePhase || "announced"}`;
     overlay.innerHTML = `
-      <div class="dead21-score-reveal-card ${reveal.punished ? "punished" : ""}" style="${originStyle}">
+      <div class="dead21-score-reveal-card ${reveal.punished ? "punished" : ""}" data-ui-style="${originStyle}">
         <strong>${renderName(reveal.playerName || "Joueur", reveal.nameSkin)}</strong>
         <div class="dead21-score-flip">
           <small class="score-announced">Main annoncée: ${announced} pts</small>
@@ -5545,7 +5548,7 @@ function renderLiarsOverlay(reveal, seatByPlayer = {}) {
     const gunAimStyle = liarsDynamicGunAimStyle(targetSeat, playerCount, seatByPlayer[reveal.shooterId || reveal.loserId]);
     overlay.className = `liars-overlay active dead21-final-overlay roulette-target-${targetDirection} death-${targetDirection}`;
     overlay.innerHTML = `
-      <div class="roulette-splash dead21-final-roulette" style="${gunAimStyle}">
+      <div class="roulette-splash dead21-final-roulette" data-ui-style="${gunAimStyle}">
         <img class="roulette-gun" src="${escapeAttr(gunImage)}" alt="" onerror="this.onerror=null;this.src='${DEFAULT_WEAPON_IMAGE}';" />
         ${roulette.dead ? `<i class="roulette-gun-flash"></i>` : ""}
         <span>${cleanLogText(reveal.loserName || "Joueur")} ${roulette.dead ? "meurt" : "survit"}</span>
@@ -5575,8 +5578,8 @@ function renderLiarsOverlay(reveal, seatByPlayer = {}) {
             ? farWestDuelGunAimStyle(shooterSeat, targetSeat, playerCount)
             : liarsDynamicGunAimStyle(targetSeat, playerCount, shooterSeat);
           return `
-          <div class="chaos-roulette-splash roulette-target-${targetDirection} death-${targetDirection} shooter-${shooterDirection} shooter-seat-${shooterSeat} target-seat-${targetSeat}" style="${gunAimStyle}">
-            <div class="demon-gun-shot" style="${gunAimStyle}">
+          <div class="chaos-roulette-splash roulette-target-${targetDirection} death-${targetDirection} shooter-${shooterDirection} shooter-seat-${shooterSeat} target-seat-${targetSeat}" data-ui-style="${gunAimStyle}">
+            <div class="demon-gun-shot" data-ui-style="${gunAimStyle}">
               <img class="demon-gun-img" src="${escapeAttr(gunImage)}" alt="" onerror="this.onerror=null;this.src='${DEFAULT_WEAPON_IMAGE}';" />
               ${activeShot.dead ? `<i class="demon-gun-flash"></i>` : ""}
             </div>
@@ -5596,7 +5599,7 @@ function renderLiarsOverlay(reveal, seatByPlayer = {}) {
     const loserSeat = seatByPlayer[reveal.loserId];
     const gunAimStyle = liarsDynamicGunAimStyle(loserSeat, playerCount, seatByPlayer[reveal.shooterId || reveal.loserId]);
     overlay.innerHTML = `
-      <div class="roulette-splash" style="${gunAimStyle}">
+      <div class="roulette-splash" data-ui-style="${gunAimStyle}">
         <img class="roulette-gun" src="${escapeAttr(gunImage)}" alt="" onerror="this.onerror=null;this.src='${DEFAULT_WEAPON_IMAGE}';" />
         ${roulette.dead ? `<i class="roulette-gun-flash"></i>` : ""}
         <span>${resultLabel}</span>
@@ -6868,14 +6871,14 @@ function renderDead21(gameState) {
   pile.innerHTML = gameState.reveal?.card
     ? `
       <div class="revealed-cards dead21-center-cards">
-        <span class="reveal-card" style="--i:0; --n:1">${dead21CardFace(gameState.reveal.card)}</span>
+        <span class="reveal-card" data-ui-style="--i:0; --n:1">${dead21CardFace(gameState.reveal.card)}</span>
       </div>
       <span class="pile-announcement">${cleanLogText(pileNote)}</span>
     `
     : gameState.lastPlay
       ? `
         <div class="pile-facedown-cards">
-          <span class="pile-facedown-card" style="--i:0; --n:1">${dead21BackFace()}</span>
+          <span class="pile-facedown-card" data-ui-style="--i:0; --n:1">${dead21BackFace()}</span>
         </div>
         <span class="pile-announcement">${cleanLogText(pileNote)}</span>
       `
@@ -6942,7 +6945,7 @@ function renderDead21(gameState) {
       const isMe = player.id === state.user?.id;
       const selected = isMe && card?.id === state.liars.deadSelectedCardId;
       return `
-        <button class="table-card dead21-table-card ${selected ? "selected" : ""} ${card?.pendingDraw ? "pending-draw" : ""}" type="button" data-dead21-card="${escapeAttr(card?.id || "")}" ${isMe && isMyTurn && !blocked && !hideOwnHand && card?.id ? "" : "disabled"} style="--i:${cardIndex}; --n:${Math.max(1, cards.length)}">
+        <button class="table-card dead21-table-card ${selected ? "selected" : ""} ${card?.pendingDraw ? "pending-draw" : ""}" type="button" data-dead21-card="${escapeAttr(card?.id || "")}" ${isMe && isMyTurn && !blocked && !hideOwnHand && card?.id ? "" : "disabled"} data-ui-style="--i:${cardIndex}; --n:${Math.max(1, cards.length)}">
           ${isMe && !hideOwnHand ? dead21CardFace(card) : dead21CardFace(null, true)}
         </button>
       `;
@@ -7092,7 +7095,7 @@ function renderLiars() {
       ? `
         <div class="revealed-cards">
           ${revealCards.map((card, index) => `
-            <span class="reveal-card" style="--i:${index}; --n:${revealCards.length}">
+            <span class="reveal-card" data-ui-style="--i:${index}; --n:${revealCards.length}">
               ${renderCardFace(card)}
             </span>
           `).join("")}
@@ -7101,7 +7104,7 @@ function renderLiars() {
       : (pileText ? `
         <div class="pile-facedown-cards">
           ${Array.from({ length: Math.min(3, pileBackCount) }, (_, index) => `
-            <span class="pile-facedown-card" style="--i:${index}; --n:${Math.min(3, pileBackCount)}">
+            <span class="pile-facedown-card" data-ui-style="--i:${index}; --n:${Math.min(3, pileBackCount)}">
               ${renderCardFace("Back")}
             </span>
           `).join("")}
@@ -7216,7 +7219,7 @@ function renderLiars() {
             const blockedByChaosSpecial = isMe && isMyTurn && isLiarsCardSelectionLocked(cards, cardIndex, gameState);
             const disabled = isMe && isMyTurn && !blocked && !hideOwnHand && !blockedByMax && !blockedByChaosSpecial ? "" : "disabled";
             return `
-              <button class="table-card ${selected ? "selected" : ""} ${blockedByMax || blockedByChaosSpecial ? "selection-locked" : ""}" type="button" data-card="${cardIndex}" ${isMe ? disabled : "disabled"} style="--i:${cardIndex}; --n:${cards.length}">
+              <button class="table-card ${selected ? "selected" : ""} ${blockedByMax || blockedByChaosSpecial ? "selection-locked" : ""}" type="button" data-card="${cardIndex}" ${isMe ? disabled : "disabled"} data-ui-style="--i:${cardIndex}; --n:${cards.length}">
                 ${isMe && !hideOwnHand ? renderCardFace(card) : renderCardFace("Back")}
               </button>
             `;
@@ -8701,6 +8704,10 @@ document.addEventListener("change", (event) => {
 
 document.addEventListener("click", (event) => {
   if (state.currentRoomId) resetRoomIdleTimer();
+  if (event.target.closest(".shop-preview-close")) {
+    closeShopWeaponPreview();
+    return;
+  }
   if (event.target?.id === "rules-modal" || event.target.closest(".rules-close")) {
     closeModeRules();
     return;
@@ -8785,9 +8792,9 @@ document.addEventListener("click", (event) => {
       openLiarsModeModal();
       return;
     }
-    createRoomInDatabase(pick.dataset.pickGame)
+    window.LTR_UI.withBusy("create-room", "[data-pick-game], [data-create-liars-mode]", "Création du salon…", () => createRoomInDatabase(pick.dataset.pickGame)
       .then((room) => enterRoom(room))
-      .catch((error) => showMessage("Impossible de creer la partie: " + (error.message || "erreur inconnue")));
+      .catch((error) => showMessage("Impossible de creer la partie: " + (error.message || "erreur inconnue"))));
   }
 
   if (event.target.closest("#claim-june-gift")) {
@@ -8797,7 +8804,7 @@ document.addEventListener("click", (event) => {
 
   const liarsMode = event.target.closest("[data-create-liars-mode]");
   if (liarsMode) {
-    createLiarsRoomWithMode(liarsMode.dataset.createLiarsMode);
+    window.LTR_UI.withBusy("create-room", "[data-pick-game], [data-create-liars-mode]", "Création du salon…", () => createLiarsRoomWithMode(liarsMode.dataset.createLiarsMode));
   }
 
   if (event.target.closest("[data-dead21-show-deck]")) {
@@ -8886,7 +8893,7 @@ document.addEventListener("click", (event) => {
 
 $("#auth-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  authWithPassword(state.authMode);
+  window.LTR_UI.withBusy("auth", "#auth-submit, .auth-tab", "Connexion à la table…", () => authWithPassword(state.authMode));
 });
 
 $$("[data-auth-mode]").forEach((button) => {
@@ -9001,19 +9008,25 @@ document.addEventListener("click", (event) => {
 });
 $("#pseudo-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  updatePseudoFromHome();
+  window.LTR_UI.withBusy("pseudo", "#pseudo-form button", "Mise à jour du pseudo…", updatePseudoFromHome);
 });
 $("#join-form").addEventListener("submit", (event) => {
   event.preventDefault();
   $("#room-code").value = cleanRoomCode($("#room-code").value);
   const code = $("#room-code").value;
   closeJoinModal();
-  joinRoom(code);
+  window.LTR_UI.withBusy("join", "#join-form button[type=submit], #play-join", "Recherche du salon…", () => joinRoom(code));
 });
 $("#share-room").addEventListener("click", async () => {
   const code = state.roomCode || "TABLE1";
-  await navigator.clipboard?.writeText(code);
-  $("#room-label").textContent = code;
+  try {
+    if (!navigator.clipboard) throw new Error("Clipboard unavailable");
+    await navigator.clipboard.writeText(code);
+    $("#room-label").textContent = code;
+    window.LTR_UI.notify("Code du salon copié : " + code);
+  } catch {
+    window.LTR_UI.notify("Copie indisponible. Partage ce code : " + code);
+  }
 });
 $("#leave-room").addEventListener("click", () => leaveCurrentRoom());
 $("#leave-room-top").addEventListener("click", () => leaveCurrentRoom());
