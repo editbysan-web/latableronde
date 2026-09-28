@@ -102,7 +102,8 @@ h2, h3 { letter-spacing: -.02em; }
 .home-actions > .big span { font-size: 20px; }
 .home-utilities { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 8px; }
 .home-utilities button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 12px 4px; min-height: 72px; background: #202c25; border: 1px solid var(--line); border-radius: 12px; color: var(--text); box-shadow: none; font-size: 11px; font-weight: 600; }
-.home-utilities button span { color: var(--gold); font-size: 22px; line-height: 1; }
+.home-utilities .utility-icon { width: 26px; height: 26px; flex: 0 0 26px; color: var(--gold); fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.home-utilities .wheel-pointer { fill: var(--gold); stroke: var(--panel); stroke-width: 1; }
 .pseudo-editor { margin-top: 3px; }
 .pseudo-editor summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 12px 2px; }
 .join-row { padding: 8px; border-radius: 12px; gap: 8px; }
