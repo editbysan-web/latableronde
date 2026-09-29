@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' data: blob: https://yhdafozbxydqemphdqvb.supabase.co; media-src 'self' blob: https://yhdafozbxydqemphdqvb.supabase.co; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://yhdafozbxydqemphdqvb.supabase.co wss://yhdafozbxydqemphdqvb.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+      content="default-src 'self'; img-src 'self' data: blob: https://yhdafozbxydqemphdqvb.supabase.co https://upload.wikimedia.org https://thumb.wikimedia.org; media-src 'self' blob: https://yhdafozbxydqemphdqvb.supabase.co; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://yhdafozbxydqemphdqvb.supabase.co wss://yhdafozbxydqemphdqvb.supabase.co https://commons.wikimedia.org https://upload.wikimedia.org https://thumb.wikimedia.org; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
     />
     <meta name="theme-color" content="#111816" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -14,6 +14,7 @@
     <title>LaTableRonde</title>
     <link rel="stylesheet" href="./styles.css?v=2026-09-23-restore-v2" />
     <link rel="stylesheet" href="./interface.css?v=2026-09-28-icons-v1" />
+    <link rel="stylesheet" href="./hear-me-out.css?v=2026-09-29-hmo-v1" />
   </head>
   <body>
     <a class="skip-link" href="#app">Aller au contenu</a>
@@ -78,7 +79,7 @@
 
           <div class="hero">
             <h1>La Table Ronde</h1>
-            <p>Who is Who, Liars Bar, True Only et Blackjack.<br />Choisis un jeu ci-dessous pour ouvrir un salon.</p>
+            <p>Who is Who, Liars Bar, True Only, Blackjack et Hear Me Out.<br />Choisis un jeu ci-dessous pour ouvrir un salon.</p>
           </div>
 
           <div class="home-actions">
@@ -106,6 +107,7 @@
               <button class="game-tile liar" type="button" data-pick-game="liars"><img src="./Image%20site/liarsbar.png" alt="" loading="lazy" /><span>Liars Bar</span><small>Bluff · 2–6 selon le mode <b aria-hidden="true">↗</b></small></button>
               <button class="game-tile trueonly" type="button" data-pick-game="true"><img src="./Image%20site/TrueOnly.png" alt="" loading="lazy" /><span>True Only</span><small>Anecdotes · 2–8 joueurs <b aria-hidden="true">↗</b></small></button>
               <button class="game-tile blackjack" type="button" data-pick-game="blackjack"><img src="./Image%20site/imagedead21.png" alt="" loading="lazy" /><span>Blackjack</span><small>Jeu de cartes · 1–4 joueurs <b aria-hidden="true">↗</b></small></button>
+              <button class="game-tile hear" type="button" data-pick-game="hear"><img src="./Image%20site/hear-me-out.svg" alt="" loading="lazy" /><span>Hear Me Out</span><small>Défends tes choix · 2–8 joueurs <b aria-hidden="true">↗</b></small></button>
             </div>
           </section>
         </section>
@@ -139,8 +141,11 @@
               <span>Blackjack</span>
               <small>Cartes &amp; prise de risque · 1–4 joueurs <b>↗</b></small>
             </button>
+            <button class="game-tile hear" type="button" data-pick-game="hear"><img src="./Image%20site/hear-me-out.svg" alt="" /><span>Hear Me Out</span><small>Défends tes choix · 2–8 joueurs <b>↗</b></small></button>
           </div>
         </section>
+
+        <section class="screen" data-screen="hear-game" aria-label="Hear Me Out"><div id="hmo-game" class="hmo"></div></section>
 
         <section class="screen" data-screen="lobby" aria-labelledby="lobby-title">
           <header class="topbar">
@@ -362,6 +367,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
     <script src="./supabase-config.js?v=2026-09-21-restore"></script>
     <script src="./interface.js?v=2026-09-24-design-v1"></script>
-    <script src="./app.js?v=2026-09-24-design-v1"></script>
+    <script src="./hear-me-out.js?v=2026-09-29-hmo-v1"></script>
+    <script src="./app.js?v=2026-09-29-hmo-v1"></script>
   </body>
 </html>

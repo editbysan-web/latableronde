@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-09-24-design-v1";
+const APP_BUILD_VERSION = "2026-09-29-hmo-v1";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
@@ -1064,6 +1064,7 @@ function cleanRoomCode(value) {
 
 function go(screen) {
   state.screen = screen;
+  window.LTR_HMO.sync();
   screens.forEach((item) => item.classList.toggle("active", item.dataset.screen === screen));
   const endScreen = document.querySelector('[data-screen="end"]');
   if (endScreen) endScreen.classList.toggle("who-screen", screen === "end" && state.game === "who");
@@ -1372,7 +1373,7 @@ function closePresencePrompt() {
 }
 
 function isPresenceRoomScreen() {
-  return Boolean(state.currentRoomId && state.user?.id && ["lobby", "liars-game", "who-game", "true-game", "photo-game", "end"].includes(state.screen));
+  return Boolean(state.currentRoomId && state.user?.id && ["lobby", "liars-game", "who-game", "true-game", "photo-game", "hear-game", "end"].includes(state.screen));
 }
 
 async function sendPresenceSignal() {
@@ -1418,8 +1419,8 @@ async function cleanupStalePresencePlayers() {
       })
       : await db.rpc("cleanup_stale_room_players_rpc", {
         p_room_id: state.currentRoomId,
-        p_stale_after_seconds: Math.ceil((PRESENCE_AWAY_PROMPT_MS + PRESENCE_AWAY_KICK_GRACE_MS) / 1000),
-        p_mobile_only: true,
+        p_stale_after_seconds: state.game === "hear" ? 120 : Math.ceil((PRESENCE_AWAY_PROMPT_MS + PRESENCE_AWAY_KICK_GRACE_MS) / 1000),
+        p_mobile_only: state.game !== "hear",
       });
     if (error) {
       if (!isMissingRpc(error)) console.warn("Presence cleanup failed:", error.message || error);
@@ -1431,6 +1432,7 @@ async function cleanupStalePresencePlayers() {
     const deletedIds = Array.isArray(data) ? data : Array.isArray(data?.deleted) ? data.deleted : [];
     const prompts = Array.isArray(data?.prompts) ? data.prompts : [];
     if (isRoomHost() && prompts.length) showAfkHostPrompt(prompts[0]);
+    if (state.game === "hear" && !deletedIds.length) return;
     await loadCurrentRoom();
     await loadRoomPlayers();
     if (state.game === "liars" && isRoomHost() && deletedIds.length) {
@@ -2516,6 +2518,7 @@ function isRoomHost() {
 }
 
 function renderCurrentRoomView() {
+  if (state.game === "hear") window.LTR_HMO.sync();
   if (state.screen === "lobby") renderLobby();
   if (state.screen === "who-game") renderWho();
   if (state.screen === "true-game") renderTrueOnly();
@@ -2527,6 +2530,7 @@ function renderCurrentRoomView() {
 
 function roomScreenForCurrentState() {
   if (state.roomStatus !== "playing") return "lobby";
+  if (state.game === "hear") return "hear-game";
   if (state.game === "who") return state.settings.who.state?.status === "finished" ? "end" : "who-game";
   if (state.game === "true") return state.settings.true.state?.status === "finished" ? "end" : "true-game";
   if (state.game === "photo") return state.settings.photo.state?.status === "finished" ? "end" : "photo-game";
@@ -2657,6 +2661,7 @@ async function loadRoomPlayers() {
 
 function startLobbyRefresh() {
   clearInterval(state.lobbyRefreshTimer);
+  if (state.game === "hear") return;
   state.lobbyRefreshTimer = setInterval(() => {
     if (document.hidden) return;
     if (state.screen === "lobby" && state.currentRoomId) {
@@ -2781,7 +2786,8 @@ function applyRoomState(room) {
   if (state.screen === "photo-game" && photoStateChanged) renderPhotoRoulette();
   if (state.screen === "liars-game" && liarsStateChanged) renderLiars();
   if (state.screen === "blackjack-game" && blackjackStateChanged) renderBlackjack();
-  if (room.status === "lobby" && ["end", "liars-game", "blackjack-game", "photo-game", "who-game", "true-game"].includes(state.screen)) {
+  if (state.game === "hear") window.LTR_HMO.sync();
+  if (room.status === "lobby" && ["end", "liars-game", "blackjack-game", "photo-game", "who-game", "true-game", "hear-game"].includes(state.screen)) {
     clearTimeout(state.liars.endTimer);
     clearTimeout(state.liars.revealTimer);
     clearTimeout(state.liars.rouletteLogTimer);
@@ -2790,7 +2796,7 @@ function applyRoomState(room) {
     return;
   }
   if (room.status === "playing" && state.screen === "lobby") {
-    go(room.game === "who" ? "who-game" : room.game === "true" ? "true-game" : room.game === "photo" ? "photo-game" : room.game === "blackjack" ? "blackjack-game" : "liars-game");
+    go(roomScreenForCurrentState());
   }
   if (room.status === "playing" && state.screen === "liars-game" && (state.liars.state?.winner || state.liars.state?.phase === "game_over")) {
     scheduleLiarsEnd(liarsEndDelay(state.liars.state));
@@ -2985,6 +2991,7 @@ async function startRoomForEveryone() {
     return;
   }
   closeTransientModals();
+  if (state.game === "hear") return window.LTR_HMO.start();
   await loadRoomPlayers();
   if (state.game !== "blackjack" && state.players.length < 2) {
     showMessage("Il faut au moins 2 joueurs pour lancer la partie.");
@@ -3278,6 +3285,7 @@ async function joinRoom(code) {
 }
 
 function renderLobby() {
+  if (state.game === "hear") { window.LTR_HMO.sync(); return; }
   const lobbyScreen = document.querySelector('[data-screen="lobby"]');
   const liarsMode = state.settings.liars.mode || "normal";
   const lobbyKey = JSON.stringify({
@@ -9099,7 +9107,7 @@ $("#afk-extend")?.addEventListener("click", () => respondAfkPrompt("extend"));
 $("#afk-kick")?.addEventListener("click", () => respondAfkPrompt("kick"));
 
 window.addEventListener("focus", () => {
-  if (state.currentRoomId && ["lobby", "liars-game", "blackjack-game", "who-game", "true-game", "photo-game", "end"].includes(state.screen)) {
+  if (state.currentRoomId && ["lobby", "liars-game", "blackjack-game", "who-game", "true-game", "photo-game", "hear-game", "end"].includes(state.screen)) {
     loadCurrentRoom();
     loadRoomPlayers();
   }
@@ -9114,6 +9122,12 @@ document.addEventListener("visibilitychange", () => {
   } else {
     handlePresenceReturn();
   }
+});
+
+window.LTR_HMO.init({
+  context: () => ({ db, game: state.game, roomId: state.currentRoomId, userId: state.user?.id,
+    hostId: state.roomHostId, code: state.roomCode, players: state.players, screen: state.screen }),
+  go, message: showMessage, leave: leaveCurrentRoom,
 });
 
 if (ensureFreshAppBuild()) setAuthMode("login");

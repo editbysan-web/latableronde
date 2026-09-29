@@ -516,7 +516,7 @@ begin
     raise exception 'not_authenticated';
   end if;
 
-  if p_game not in ('who', 'true', 'liars', 'photo', 'blackjack') then
+  if p_game not in ('who', 'true', 'liars', 'photo', 'blackjack', 'hear') then
     raise exception 'invalid_game';
   end if;
 
