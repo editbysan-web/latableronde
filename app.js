@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-10-16-hmo-auto-v3";
+const APP_BUILD_VERSION = "2026-10-16-hmo-labels-v4";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
