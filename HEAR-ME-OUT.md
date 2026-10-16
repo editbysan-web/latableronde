@@ -1,4 +1,25 @@
-# Hear Me Out — 29 septembre 2026
+# Hear Me Out — évolution du 16 octobre 2026
+
+## Nouveau déroulement (travail local, publication en attente)
+
+- Lobby : thème commun ou individuel, 1 à 7 manches ; thèmes tirés au sort.
+- Une image par joueur et par manche, avec un délai serveur de 2 minutes maximum.
+- Le dernier dépôt déclenche immédiatement les révélations, sans attendre le délai.
+- Tous les votes reçus : résultat affiché 3 secondes, puis photo suivante automatiquement.
+- Entre deux manches : pause de 5 secondes, puis nouveau thème et nouveau délai.
+- Les transitions sont sérialisées côté serveur ; n'importe quel membre peut les déclencher
+  à l'échéance via la lecture RPC, sans dépendre de la présence de l'hôte.
+- Les parties v1 existantes conservent leur ancien fonctionnement.
+
+Appliquer `supabase-hear-me-out-rounds.sql` après le script initial, puis publier le frontend.
+Tests : `scripts/test-hmo-rounds.cjs` vérifie les transitions automatiques, la confidentialité,
+les délais, les votes, les départs et les manches vides sur PostgreSQL local (PGlite).
+Le test navigateur multijoueur et la publication de cette révision restent à terminer.
+Le 16 octobre, connexion administrateur rétablie, projet Supabase trouvé en pause :
+reprise demandée avant application de la migration et promotion du frontend.
+Déploiement Vercel de contrôle : `dpl_FEJzd1LRy1uvLqkZF7S1cX1dSL6T` (READY).
+
+## Documentation historique v1
 
 Intégration ciblée au site HTML/CSS/JS existant, sans nouveau framework,
 authentification ou lobby. Version frontend : `2026-09-29-hmo-v1`.

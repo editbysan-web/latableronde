@@ -4,7 +4,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const app = read('app.js') + '\n' + read('hear-me-out.js');
-const sql = read('supabase-multiplayer-setup.sql') + '\n' + read('supabase-hear-me-out.sql');
+const sql = read('supabase-multiplayer-setup.sql') + '\n' + read('supabase-hear-me-out.sql') + '\n' + read('supabase-hear-me-out-rounds.sql');
 const functions = new Set([...sql.matchAll(/create (?:or replace )?function public\.([a-z0-9_]+)/gi)].map(m => m[1]));
 const calls = new Set([...app.matchAll(/["']([a-z0-9_]+_rpc)["']/g)].map(m => m[1]));
 const tables = new Set([...sql.matchAll(/create table if not exists public\.([a-z0-9_]+)/gi)].map(m => m[1]));

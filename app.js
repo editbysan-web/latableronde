@@ -66,7 +66,7 @@ const DEFAULT_PROFILE_SHOP = {
 };
 const ROOM_SESSION_KEY = "ltr.currentRoomId";
 const ROOM_CLEANUP_KEY = "ltr.lastRoomCleanupAt";
-const APP_BUILD_VERSION = "2026-09-29-hmo-v1";
+const APP_BUILD_VERSION = "2026-10-16-hmo-auto-v3";
 const PHOTO_BUCKET = "photo-roulette";
 const JUNE_GIFT_AMOUNT = 1000;
 let appBuildRefreshPending = false;
@@ -1292,6 +1292,8 @@ function presenceDeviceType() {
 }
 
 function liarsAntiAfkEnabled() {
+  // Hear Me Out explicitly lets players leave the browser to find an image.
+  if (state.game === "hear") return false;
   return state.game !== "liars" || state.settings.liars?.antiAfkEnabled !== false;
 }
 

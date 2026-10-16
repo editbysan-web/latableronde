@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" fill="none">
+<defs>
+ <linearGradient id="icing" x1="180" y1="180" x2="780" y2="380" gradientUnits="userSpaceOnUse"><stop stop-color="#dda4a1"/><stop offset=".48" stop-color="#c68c8a"/><stop offset="1" stop-color="#925b64"/></linearGradient>
+ <linearGradient id="cream" x1="250" y1="80" x2="690" y2="220" gradientUnits="userSpaceOnUse"><stop stop-color="#fff5df"/><stop offset="1" stop-color="#e5c9ad"/></linearGradient>
+ <linearGradient id="silver" x1="290" y1="320" x2="640" y2="445" gradientUnits="userSpaceOnUse"><stop stop-color="#f2e7ce"/><stop offset=".35" stop-color="#8e9388"/><stop offset=".53" stop-color="#d0d4c6"/><stop offset="1" stop-color="#626f66"/></linearGradient>
+ <radialGradient id="berry"><stop stop-color="#d85859"/><stop offset=".6" stop-color="#9e303f"/><stop offset="1" stop-color="#5e172c"/></radialGradient>
+ <radialGradient id="shadow"><stop stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+ <g id="dollop"><path d="M-21 7C-24-3-11-11-5-20-3-14 8-13 14-8 27 1 23 10 15 13-1 20-19 16-21 7Z" fill="#fff0d7"/><path d="M-11 10C-17-1-3-7-5-20M4 12C14 3 2-2 0-10" stroke="#dfbd9c" stroke-width="2" stroke-linecap="round"/></g>
+ <g id="cherry"><ellipse cy="3" rx="15" ry="14" fill="url(#berry)"/><ellipse cx="-5" cy="-2" rx="3" ry="5" fill="#ffb8a5" opacity=".7"/><path d="M0-8C-1-23 8-24 13-29" stroke="#657654" stroke-width="3" stroke-linecap="round"/></g>
+</defs>
+<ellipse cx="480" cy="445" rx="410" ry="33" fill="url(#shadow)"/>
+<path d="M451 358H509L523 418C560 421 590 429 590 438H370C370 429 400 421 437 418Z" fill="url(#silver)"/>
+<ellipse cx="480" cy="438" rx="110" ry="12" fill="url(#silver)"/>
+<path d="M99 317H861V337C861 388 99 388 99 337Z" fill="url(#silver)"/>
+<ellipse cx="480" cy="317" rx="382" ry="63" fill="#d9d5bd"/>
+<ellipse cx="480" cy="318" rx="353" ry="52" stroke="#8e9181" stroke-width="3"/>
+<path d="M153 157H807V298C807 371 153 371 153 298Z" fill="url(#icing)"/>
+<path d="M158 275C265 340 695 340 802 275M157 291C279 354 686 354 803 291" stroke="#edb8a6" stroke-opacity=".4" stroke-width="5"/>
+<ellipse cx="480" cy="157" rx="327" ry="103" fill="url(#cream)"/>
+<path d="M154 160C171 193 190 198 207 184 217 179 217 217 237 225 258 231 268 206 283 211 303 217 316 245 337 240 359 235 365 226 383 234 399 246 411 263 428 252 447 237 460 242 481 247 503 262 517 254 530 243 551 234 561 254 581 245 602 236 611 232 633 235 657 231 659 202 680 209 702 216 708 207 722 190 736 171 748 192 765 182 786 178 800 169 807 158 792 269 173 282 154 160Z" fill="#f5dfbe"/>
+<ellipse cx="480" cy="147" rx="281" ry="76" stroke="#d7b698" stroke-opacity=".6" stroke-width="3"/>
+<g opacity=".8" stroke="#edd3b4" stroke-width="3"><path d="M213 263Q237 300 261 275T309 289T357 299T405 305T453 308T501 308T549 305T597 300T645 289T693 278T741 263"/></g>
+<g>
+ <use href="#dollop" x="209" y="162"/><use href="#dollop" x="242" y="122"/><use href="#dollop" x="298" y="92"/><use href="#dollop" x="369" y="73"/><use href="#dollop" x="444" y="67"/><use href="#dollop" x="520" y="68"/><use href="#dollop" x="596" y="78"/><use href="#dollop" x="665" y="100"/><use href="#dollop" x="722" y="129"/><use href="#dollop" x="751" y="163"/>
+ <use href="#dollop" x="232" y="202"/><use href="#dollop" x="292" y="228"/><use href="#dollop" x="365" y="244"/><use href="#dollop" x="443" y="252"/><use href="#dollop" x="521" y="252"/><use href="#dollop" x="599" y="242"/><use href="#dollop" x="673" y="226"/><use href="#dollop" x="731" y="201"/>
+</g>
+<use href="#cherry" x="241" y="110"/><use href="#cherry" x="443" y="53"/><use href="#cherry" x="664" y="87"/><use href="#cherry" x="731" y="189"/><use href="#cherry" x="521" y="237"/><use href="#cherry" x="293" y="215"/>
+<path d="M430 165q50-28 100 0" stroke="#c8917d" stroke-width="2" stroke-linecap="round"/>
+</svg>

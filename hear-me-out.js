@@ -4,6 +4,8 @@
   let bridge, room = '', channel, snapshot, busy = false, loading = false, again = false;
   let renderKey = '', gallery = [], generation = 0, memberKey = '', galleryAbort, message = '', galleryMessage = '';
   const images = new Map();
+  let clockTimer, deadlineAt = 0, expiryAttempt = 0, sceneKey = '', previewUrl = '';
+  const cakeSeen = new Set();
   const $ = (s) => document.querySelector(s);
   const escape = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const ctx = () => bridge.context();
@@ -11,6 +13,8 @@
   const notice = (value) => { message = value; const el = $('#hmo-notice'); if (el) el.textContent = value; else if (value) bridge.message(value); };
   const messages = {selection_locked:'La sélection est verrouillée.',selection_full:'Ta sélection est complète.',selection_incomplete:'Complète ta sélection avant de te déclarer prêt.',everyone_must_be_ready:'Il faut au moins deux joueurs, tous prêts.',not_your_turn:'Ce n’est pas ton tour.',cannot_vote:'Tu ne peux pas voter sur ce choix.',stale_turn:'Ce tour est terminé. La partie a été actualisée.',maximum_8_players:'Hear Me Out accueille de 2 à 8 joueurs.',not_member:'Tu ne fais plus partie de ce salon.'};
   function errorText(error) {
+    if (/minimum_two_players/.test(error?.message || '')) return 'Il faut au moins deux joueurs pour lancer la partie.';
+    if (/stale_round|selection_locked/.test(error?.message || '') && snapshot?.flowVersion===2) return 'Le temps est écoulé. La sélection de cette manche est fermée.';
     if (/Failed to fetch|AbortError|TimeoutError|aborted/i.test(error?.message || '')) return 'Connexion interrompue. Réessaie ; les choix déjà enregistrés sont conservés.';
     const key = Object.keys(messages).find(k => String(error?.message).includes(k));
     if (key) return messages[key];
@@ -19,6 +23,9 @@
     return error?.message || 'Action impossible. Réessaie dans un instant.';
   }
   function reset() {
+    clearInterval(clockTimer); clockTimer = null; deadlineAt = 0; expiryAttempt = 0; sceneKey = ''; cakeSeen.clear();
+    if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = '';
+    $('[data-screen="lobby"]')?.classList.remove('hmo-lobby-screen');
     generation++; if (channel) ctx().db?.removeChannel(channel);
     channel = null; room = ''; snapshot = null; renderKey = ''; memberKey = ''; loading = false; again = false; message = '';
     galleryAbort?.abort(); gallery = []; galleryMessage = '';
@@ -35,7 +42,13 @@
     const {data, error} = result;
     if (error) throw error;
     if (room !== target || token !== generation) return;
-    if (!snapshot || data.revision >= snapshot.revision) snapshot = data;
+    if (!snapshot || data.revision >= snapshot.revision) {
+      snapshot = data;
+      if (data.flowVersion === 2) {
+        deadlineAt = performance.now() + Math.max(0, Date.parse(data.deadline) - Date.parse(data.serverNow));
+        if (!clockTimer) clockTimer = setInterval(tickClock,250);
+      }
+    }
     render();
     return data;
   }
@@ -67,7 +80,7 @@
     if (busy) return;
     busy = true; message = ''; renderKey = ''; render();
     try { await rpc(action,payload); }
-    catch (e) { notice(errorText(e)); }
+    catch (e) { notice(errorText(e)); if (snapshot?.flowVersion===2) refresh(); }
     finally { busy = false; renderKey = ''; render(); }
   }
   function photo(choice, full = false) {
@@ -94,6 +107,7 @@
   }
   function render() {
     if (!room) return;
+    if (snapshot?.flowVersion === 2) { renderRounds(); return; }
     const s = ctx();
     if (snapshot && !['setup','preparing'].includes(snapshot.phase) && s.screen === 'lobby') { bridge.go('hear-game'); return; }
     const root = mount(); if (!root) return;
@@ -146,6 +160,81 @@
     }
     root.querySelectorAll('.hmo-sources button').forEach(el => { el.disabled = busy; });
     hydrate(root); renderGallery();
+  }
+  function tickClock() {
+    if (snapshot?.flowVersion !== 2 || !['collecting','result','round_end'].includes(snapshot.phase)) return;
+    const left = Math.max(0, Math.ceil((deadlineAt-performance.now())/1000));
+    const advance = $('#hmo-auto-next'); if (advance) advance.textContent = `La suite dans ${left} s…`;
+    const timer = $('#hmo-time');
+    if (timer) { timer.textContent = `${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`; timer.closest('.hmo-clock').classList.toggle('urgent',left<=15); }
+    const bar = $('#hmo-time-bar'); if (bar) bar.style.transform = `scaleX(${left/120})`;
+    $('#hmo-import')?.querySelectorAll('button,input').forEach(el => { el.disabled = busy || left===0; });
+    if (!left && !loading && performance.now()>expiryAttempt) {
+      expiryAttempt = performance.now()+3000; refresh();
+    }
+  }
+  function cakeMarkup(g) {
+    const cards = g.cake.map(c => {
+      const fresh = !cakeSeen.has(c.id); cakeSeen.add(c.id);
+      return `<figure class="hmo-pick ${fresh ? 'hmo-pick-new' : ''}" data-choice="${c.id}">${photo(c)}<figcaption>${escape(c.title)}<small>${escape(c.pseudo)}</small></figcaption></figure>`;
+    }).join('');
+    return `<section class="hmo-cake hmo-cake-v2" aria-label="Gâteau de la partie"><div class="hmo-cake-label"><span>LA PIÈCE MONTÉE</span><small>${g.cake.length} souvenir${g.cake.length>1?'s':''} de la table</small></div><div class="hmo-cake-photos">${cards}</div><div class="hmo-cake-art"><img src="./Image%20site/hmo-cake.svg" alt="Gâteau à la crème, cerises et glaçage rose sur son présentoir" width="960" height="480"><span>Hear me out.</span></div></section>`;
+  }
+  function renderRounds() {
+    const s=ctx(), g=snapshot, host=s.hostId===s.userId;
+    if (g.phase!=='setup' && s.screen==='lobby') { bridge.go('hear-game'); return; }
+    const root=mount(); if (!root) return;
+    root.classList.add('hmo-v2');
+    const key=JSON.stringify([g.revision,g.phase,s.hostId,s.screen,busy]);
+    if (key===renderKey && root.dataset.mounted==='true') return;
+    renderKey=key; root.dataset.mounted='true';
+    const scene=`${room}:${g.round}:${g.phase}:${g.current?.id || ''}`;
+    const entered=scene!==sceneKey; sceneKey=scene;
+    const sourceKey=`${room}:${g.round}:${g.mine.map(c=>c.id).join(',')}`;
+    const sources=root.dataset.sourceKey===sourceKey ? root.querySelector('.hmo-sources') : null;
+    const config=root.querySelector('#hmo-config'), values=config && !config.querySelector('fieldset:disabled') ? Object.fromEntries(new FormData(config)) : null;
+    root.dataset.sourceKey=sourceKey;
+    const oldCards=new Map([...root.querySelectorAll('[data-choice]')].map(el=>[el.dataset.choice,el]));
+    let html=`<p id="hmo-notice" role="status" class="hmo-notice">${escape(message)}</p>`;
+    if (g.phase==='setup') {
+      $('[data-screen="lobby"]').classList.add('hmo-lobby-screen');
+      $('#players').innerHTML=g.players.map(p=>`<div class="player-row"><strong>${escape(p.pseudo)}${p.id===s.hostId?' ♛':''}</strong><span class="badge">À table</span></div>`).join('');
+      $('#start-game').textContent=host?'Lancer les 2 minutes':'En attente de l’hôte';
+      $('#start-game').disabled=busy || !host || g.players.length<2;
+      html+=`<div class="hmo-lobby-intro"><span class="hmo-eyebrow">LE GOÛT DU DÉBAT</span><h3>Des choix discutables.<br><em>Un gâteau mémorable.</em></h3><p>Une image chacun. Deux minutes pour la trouver.<br>Après, il faudra l’assumer.</p></div><form id="hmo-config"><fieldset ${!host||busy?'disabled':''}><legend>La règle du jeu</legend><div class="hmo-mode-options"><label><input type="radio" name="mode" value="common" ${g.mode==='common'?'checked':''}><span><b>Thème commun</b><small>Le même défi pour toute la table.</small></span></label><label><input type="radio" name="mode" value="individual" ${g.mode==='individual'?'checked':''}><span><b>Chacun son thème</b><small>Un thème secret différent par joueur.</small></span></label></div><label class="hmo-round-input">Nombre de manches <select name="rounds">${[1,2,3,4,5,6,7].map(n=>`<option value="${n}" ${n===g.rounds?'selected':''}>${n} manche${n>1?'s':''}</option>`).join('')}</select></label></fieldset><p class="hmo-random-note">↝ Les thèmes sont tirés au sort à chaque manche.</p></form><div class="hmo-flow"><span><b>01</b> Trouver</span><span><b>02</b> Révéler</span><span><b>03</b> Voter</span></div>`;
+      if (g.players.length<2) html+='<p class="hmo-wait-note">Il manque un convive. Partage le code du salon.</p>';
+    } else {
+      html+=`<header class="hmo-heading"><div><span class="hmo-eyebrow">HEAR ME OUT / LA TABLE RONDE</span><h2>${g.phase==='finished'?'La crème de vos choix.':`Manche ${g.round}<span class="hmo-round-total"> / ${g.rounds}</span>`}</h2></div>${button('leave','Quitter')}</header>`;
+      if (g.phase==='collecting') {
+        html+=`<section class="hmo-collect ${entered?'hmo-scene-enter':''}"><div class="hmo-theme-panel"><span class="hmo-eyebrow">${g.mode==='common'?'LE THÈME DE LA TABLE':'TON THÈME SECRET'}</span><h3>${escape(g.myTheme)}</h3><p>Trouve <strong>une image</strong> qui mérite sa place sur le gâteau. Personne ne la voit avant la révélation.</p><div class="hmo-clock" role="timer" aria-label="Temps restant pour importer"><strong id="hmo-time">2:00</strong><span>pour faire ton choix</span></div><div class="hmo-time-track"><i id="hmo-time-bar"></i></div><div class="hmo-player-status">${g.players.map(p=>`<span class="${p.ready?'ready':''}"><i aria-hidden="true">${p.ready?'✓':'·'}</i>${escape(p.pseudo)}<small>${p.ready?'Image déposée':'En recherche'}</small></span>`).join('')}</div></div><div class="hmo-upload-panel">`;
+        if (g.mine.length) {
+          html+=`<div class="hmo-sealed"><span class="hmo-eyebrow">BIEN GARDÉ, JUSQU’AU VERDICT</span><div class="hmo-sealed-photo">${photo(g.mine[0],true)}</div><h4>${escape(g.mine[0].title)}</h4><p>Ton image est enregistrée.<br>La révélation commence à la fin du chrono.</p>${button('remove','Changer mon image',busy,`data-id="${g.mine[0].id}"`)}</div>`;
+        } else {
+          html+=`<div class="hmo-sources"><form id="hmo-import"><label class="hmo-dropzone"><input type="file" name="image" accept="image/jpeg,image/png,image/webp" required aria-label="Choisir mon image"><span class="hmo-upload-symbol" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="6" y="10" width="29" height="31" rx="4"/><path d="m10 33 8-9 7 7 4-4 5 6M33 17V3m-6 7 6-7 7 7"/><circle cx="15" cy="18" r="2"/></svg></span><strong id="hmo-file-label">Dépose ton meilleur argument.</strong><span>Clique pour choisir une image</span><small>JPEG, PNG, WebP · 8 Mo maximum</small><img id="hmo-upload-preview" alt="Aperçu de ton image" hidden></label><label>Un nom pour ton choix <span class="hmo-optional">facultatif</span><input name="title" maxlength="100" placeholder="Tu vas devoir nous expliquer…"></label><button class="hmo-submit-image" type="submit" ${busy?'disabled':''}>Garder mon choix secret <span aria-hidden="true">↗</span></button></form><details class="hmo-gallery-details"><summary>Besoin d’inspiration ? Ouvrir la galerie</summary><form id="hmo-search"><label>Rechercher une image libre<input name="query" type="search" maxlength="100" placeholder="Nom du personnage"></label><button type="submit">Rechercher</button></form><div id="hmo-gallery" class="hmo-gallery"></div></details><p class="hmo-upload-note">Le chronomètre ne s’arrête pas pendant l’import. Utilise une image que tu peux partager.</p></div>`;
+        }
+        html+='</div></section>';
+      }
+      if (g.current && ['voting','result'].includes(g.phase)) {
+        const c=g.current, mine=g.author===s.userId;
+        html+=`<section class="hmo-reveal ${entered?'hmo-scene-enter':''}"><div class="hmo-feature-photo"><span class="hmo-photo-stamp">HEAR ME OUT…</span>${photo(c,true)}<span class="hmo-photo-signature">${escape(c.pseudo)}</span></div><div class="hmo-verdict"><span class="hmo-eyebrow">${escape(c.theme)}</span><h3>${escape(c.title)}</h3><p>${mine?'C’est ton choix. À toi de le défendre.':`${escape(c.pseudo)} a quelque chose à vous expliquer.`}</p>${credit(c)}`;
+        if (g.phase==='voting') html+=`<div class="hmo-votes">${[['yes','👍','Oui','Je valide'],['meh','🤨','Bof','À débattre'],['no','💀','Non','Vraiment ?']].map(([vote,icon,label,sub])=>button('vote',`<span aria-hidden="true">${icon}</span><b>${label}</b><small>${sub}</small>`,busy||mine||!!g.myVote,`data-vote="${vote}" data-id="${c.id}" class="${g.myVote===vote?'selected':''}"`)).join('')}</div><p class="hmo-vote-progress" role="status">${g.myVote?'Ton vote est enregistré. ':''}${g.voted} / ${g.eligible} vote${g.eligible>1?'s':''}</p>`;
+        else html+=`<div class="hmo-results">${[['yes','Oui'],['meh','Bof'],['no','Non']].map(([v,label])=>`<span>${label}<b>${c.result[v]}</b></span>`).join('')}</div><p id="hmo-auto-next" role="status">La suite dans 3 s…</p>`;
+        html+='</div></section>';
+      }
+      if (g.phase==='round_end') html+=`<section class="hmo-intermission ${entered?'hmo-scene-enter':''}"><span class="hmo-eyebrow">ON REMET ÇA ?</span><h3>Manche ${g.round} terminée.</h3><p>Le prochain thème vous attend. Nouvelle manche, nouveau choix.</p><p id="hmo-auto-next" role="status">La suite dans 5 s…</p></section>`;
+      if (g.phase==='finished') html+=`<div class="hmo-finale ${entered?'hmo-scene-enter':''}"><p>Des goûts personnels. Un souvenir collectif.</p><span class="hmo-confetti" aria-hidden="true">✦ · ✧ · ✦</span></div>`;
+      if (g.phase!=='collecting') html+=cakeMarkup(g);
+      if (g.phase==='finished') html+=stats(g.cake)+button('download','Télécharger le gâteau ↓',busy||!g.cake.length,'class="hmo-download"')+`<details class="hmo-credits"><summary>Crédits des images</summary>${g.cake.map(c=>`<p>${escape(c.title)}${credit(c)}</p>`).join('')}</details>`;
+    }
+    root.innerHTML=html;
+    if (sources && root.querySelector('.hmo-sources')) root.querySelector('.hmo-sources').replaceWith(sources);
+    if (values && root.querySelector('#hmo-config')) {
+      const radio=root.querySelector(`#hmo-config input[value="${values.mode==='individual'?'individual':'common'}"]`); if (radio) radio.checked=true;
+      root.querySelector('#hmo-config [name="rounds"]').value=values.rounds;
+    }
+    root.querySelectorAll('[data-choice]').forEach(el=>{const old=oldCards.get(el.dataset.choice);if(old)el.replaceWith(old);});
+    hydrate(root); renderGallery(); tickClock();
+    if (entered && s.screen==='hear-game') root.scrollIntoView({block:'start',behavior:'instant'});
   }
   function stats(cake) {
     const positive = cake.filter(c => c.result.yes > 0).sort((a,b) => b.result.yes-a.result.yes)[0];
@@ -214,7 +303,7 @@
   }
   async function addImage(blob, title, credit = '', source = '') {
     if (busy) return;
-    const s = ctx(), target = room, token = generation;
+    const s = ctx(), target = room, token = generation, round = snapshot?.round;
     busy = true;
     notice('Préparation et envoi de l’image…');
     let uploaded = [];
@@ -227,7 +316,7 @@
         if (error) throw error; uploaded.push(paths[i]);
       }
       if (token !== generation) throw new Error('Le salon a changé.');
-      await rpc('add',{title:title.trim().slice(0,100),path:paths[0],thumb:paths[1],credit:credit.slice(0,1200),source:source.slice(0,1000)});
+      await rpc('add',{title:(title.trim() || 'Mon choix').slice(0,100),path:paths[0],thumb:paths[1],credit:credit.slice(0,1200),source:source.slice(0,1000),round});
       message = '';
       uploaded = [];
     } catch (e) {
@@ -241,20 +330,17 @@
     busy = true; notice('Génération du gâteau…');
     try {
       const cake = [...snapshot.cake];
-      const bitmaps = [];
-      try {
-        // Sequential decode bounds memory; never export an incomplete cake silently.
-        for (const c of cake) {
-          const url = await imageUrl(c.path); const img = new Image(); img.src = url; await img.decode(); bitmaps.push(img);
-        }
+      {
         const cols = Math.min(5,cake.length), rows = Math.ceil(cake.length/cols), w = 1200, rowH = 278;
-        const canvas = document.createElement('canvas'); canvas.width=w; canvas.height=170+rows*rowH+190;
-        const c = canvas.getContext('2d'); c.fillStyle='#211e1b'; c.fillRect(0,0,w,canvas.height);
+        const canvas = document.createElement('canvas'); canvas.width=w; canvas.height=170+rows*rowH+440;
+        const c = canvas.getContext('2d'); c.fillStyle='#111816'; c.fillRect(0,0,w,canvas.height);
         c.fillStyle='#f9eadd'; c.textAlign='center'; c.font='bold 54px Georgia'; c.fillText('Hear Me Out Cake',w/2,85);
         c.font='20px sans-serif'; c.fillStyle='#cfbca7'; c.fillText('La Table Ronde',w/2,123);
         const cellW = (w-80)/cols, imgSize = Math.min(195,cellW-22);
-        cake.forEach((ch,i) => {
-          const x=40+(i%cols)*cellW+cellW/2, y=165+Math.floor(i/cols)*rowH, img=bitmaps[i];
+        // Decode, draw and release one photo at a time: 56 choices must fit on mobile.
+        for (const [i,ch] of cake.entries()) {
+          const img=new Image(); img.src=await imageUrl(ch.path); await img.decode();
+          const x=40+(i%cols)*cellW+cellW/2, y=165+Math.floor(i/cols)*rowH;
           c.fillStyle='#cdb797'; c.fillRect(x-3,y+imgSize,6,72);
           c.fillStyle='#fff4e8'; c.fillRect(x-imgSize/2-7,y-7,imgSize+14,imgSize+61);
           c.fillStyle='#ead7ca'; c.fillRect(x-imgSize/2,y,imgSize,imgSize);
@@ -262,15 +348,16 @@
           c.drawImage(img,x-img.width*scale/2,y+(imgSize-img.height*scale)/2,img.width*scale,img.height*scale);
           c.fillStyle='#2d2522'; c.font='bold 16px sans-serif'; c.fillText(ch.title,x,y+imgSize+24,imgSize);
           c.font='14px sans-serif'; c.fillText(ch.pseudo,x,y+imgSize+45,imgSize);
-        });
-        const baseY=165+rows*rowH;
-        c.fillStyle='#b37778'; c.beginPath(); c.roundRect(100,baseY,1000,100,35); c.fill();
-        c.fillStyle='#eed9c4'; c.beginPath(); c.ellipse(600,baseY+12,500,36,0,0,Math.PI*2); c.fill();
-        c.fillStyle='#502e31'; c.font='24px Georgia'; c.fillText('HEAR ME OUT',600,baseY+76);
+          img.src='';
+        }
+        const baseY=135+rows*rowH;
+        const cakeArt=new Image(); cakeArt.src='./Image%20site/hmo-cake.svg'; await cakeArt.decode();
+        c.drawImage(cakeArt,140,baseY,920,460);
+        c.fillStyle='#7d4d48'; c.font='italic 32px Georgia'; c.fillText('Hear me out.',600,baseY+182);
         const blob = await new Promise((resolve,reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Export PNG impossible.')), 'image/png'));
         const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='hear-me-out-cake.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),30000);
         notice('Gâteau prêt : le téléchargement a été lancé.');
-      } finally { bitmaps.length=0; }
+      }
     } catch (e) { notice('Export interrompu : une image n’a pas pu être chargée. Réessaie. ' + errorText(e)); }
     finally { busy = false; }
   }
@@ -278,16 +365,35 @@
     const form = event.target;
     if (!['hmo-config','hmo-search','hmo-import'].includes(form.id)) return;
     event.preventDefault(); const data = new FormData(form);
-    if (form.id === 'hmo-config') act('prepare',{mode:data.get('mode'),theme:data.get('theme'),count:Number(data.get('count'))});
+    if (form.id === 'hmo-config') {
+      if (snapshot?.flowVersion===2) act('configure',{mode:data.get('mode'),rounds:Number(data.get('rounds'))});
+      else act('prepare',{mode:data.get('mode'),theme:data.get('theme'),count:Number(data.get('count'))});
+    }
     if (form.id === 'hmo-search') search(String(data.get('query')).trim());
     if (form.id === 'hmo-import') addImage(data.get('image'),String(data.get('title')));
+  });
+  document.addEventListener('change',event=>{
+    const input=event.target;
+    if (snapshot?.flowVersion!==2) return;
+    if (input.closest('#hmo-config')) {
+      const data=new FormData(input.closest('form')); act('configure',{mode:data.get('mode'),rounds:Number(data.get('rounds'))});
+    }
+    if (input.matches('#hmo-import input[type="file"]')) {
+      const file=input.files?.[0], img=$('#hmo-upload-preview');
+      if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl='';
+      if (file && img) {
+        previewUrl=URL.createObjectURL(file); img.src=previewUrl; img.hidden=false;
+        $('#hmo-file-label').textContent=file.name;
+      }
+    }
   });
   document.addEventListener('click', async event => {
     const el=event.target.closest('[data-hmo]'); if (!el || el.disabled || !snapshot) return;
     const action=el.dataset.hmo;
     if (action === 'leave') { bridge.leave(); return; }
     if (action === 'ready') { act('ready',{ready:!snapshot.myReady}); return; }
-    if (action === 'remove') { act('remove',{id:el.dataset.id}); return; }
+    if (action === 'remove') { act('remove',{id:el.dataset.id,round:snapshot.round}); return; }
+    if (action === 'next' && snapshot.flowVersion===2) { act('next',{id:snapshot.current?.id,round:snapshot.round}); return; }
     if (action === 'vote') { act('vote',{id:el.dataset.id,vote:el.dataset.vote}); return; }
     if (action === 'download') { download(); return; }
     if (action === 'gallery') {
@@ -304,5 +410,11 @@
   });
   window.addEventListener('online',refresh);
   window.addEventListener('focus',() => { if (room) refresh(); });
-  window.LTR_HMO={init(value){bridge=value;},sync,start(){return act('start');},reset};
+  window.LTR_HMO={init(value){bridge=value;},sync,start(){
+    if (snapshot?.flowVersion===2) {
+      const form=$('#hmo-config'), data=form?new FormData(form):null;
+      return act('start',{mode:data?.get('mode') || snapshot.mode,rounds:Number(data?.get('rounds') || snapshot.rounds)});
+    }
+    return act('start');
+  },reset};
 })();
