@@ -1,6 +1,6 @@
 # Hear Me Out — évolution du 16 octobre 2026
 
-## Nouveau déroulement (travail local, publication en attente)
+## Nouveau déroulement (publié le 16 octobre 2026)
 
 - Lobby : thème commun ou individuel, 1 à 7 manches ; thèmes tirés au sort.
 - Une image par joueur et par manche, avec un délai serveur de 2 minutes maximum.
@@ -14,10 +14,13 @@
 Appliquer `supabase-hear-me-out-rounds.sql` après le script initial, puis publier le frontend.
 Tests : `scripts/test-hmo-rounds.cjs` vérifie les transitions automatiques, la confidentialité,
 les délais, les votes, les départs et les manches vides sur PostgreSQL local (PGlite).
-Le test navigateur multijoueur et la publication de cette révision restent à terminer.
-Le 16 octobre, connexion administrateur rétablie, projet Supabase trouvé en pause :
-reprise demandée avant application de la migration et promotion du frontend.
-Déploiement Vercel de contrôle : `dpl_FEJzd1LRy1uvLqkZF7S1cX1dSL6T` (READY).
+Le 16 octobre, le projet Supabase en pause a été relancé, puis la migration appliquée
+avec succès. Contrôle SQL : RPC et délais automatiques installés, accès anonyme refusé.
+Déploiement Vercel : `dpl_FEJzd1LRy1uvLqkZF7S1cX1dSL6T` (READY), promu sur
+`https://latableronde.vercel.app`. Les cinq fichiers frontend modifiés répondent en
+HTTP 200 et correspondent octet par octet aux fichiers locaux. Accueil sans erreur console.
+Tests PostgreSQL v1/v2 et audit statique réussis ; une partie complète à plusieurs
+navigateurs n'a pas été rejouée après cette publication.
 
 ## Documentation historique v1
 
